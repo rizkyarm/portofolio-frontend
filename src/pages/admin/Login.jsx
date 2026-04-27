@@ -9,10 +9,9 @@ export default function Login() {
   const [form, setForm]       = useState({ email: '', password: '' });
   const [errors, setErrors]   = useState({});
   const [showPass, setShowPass] = useState(false);
-  const [status, setStatus]   = useState('idle'); // idle | loading | error
+  const [status, setStatus]   = useState('idle'); 
   const [errMsg, setErrMsg]   = useState('');
 
-  /* Redirect jika sudah login */
   useEffect(() => {
     if (user) navigate('/admin', { replace: true });
   }, [user, navigate]);
@@ -119,7 +118,7 @@ export default function Login() {
 
         {/* Bottom */}
         <div className="relative text-xs text-slate-600">
-          © {new Date().getFullYear()} Ariana Kresna. All Rights Reserved.
+          © {new Date().getFullYear()} Rizki Aditiya. All Rights Reserved.
         </div>
       </div>
 

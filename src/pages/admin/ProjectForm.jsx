@@ -321,7 +321,7 @@ export default function ProjectForm() {
   const [toast,       setToast]       = useState(null);
   const [activeTab,   setActiveTab]   = useState('basic');
 
-  /* Fetch existing project for edit */
+  /* Fetch existing project */
   useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
@@ -422,7 +422,6 @@ export default function ProjectForm() {
       const msg = err?.response?.data?.message || 'Terjadi kesalahan. Coba lagi.';
       setToast({ type: 'error', message: msg });
 
-      /* Tampilkan validation errors dari Laravel */
       if (err?.response?.data?.errors) {
         setErrors(err.response.data.errors);
       }

@@ -7,7 +7,7 @@ import {
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-/* ── Kategori config ── */
+/* ── Category ── */
 const CATEGORIES = [
   { key: 'frontend', label: 'Frontend', color: '#6c5ce7', bg: 'bg-purple-100 text-purple-700' },
   { key: 'mobile',   label: 'Mobile',   color: '#e84393', bg: 'bg-pink-100 text-pink-700' },
@@ -466,7 +466,6 @@ export default function SkillsAdmin() {
   const [delLoading, setDelLoading] = useState(false);
   const [toast,      setToast]      = useState(null);
 
-  /* Fetch dengan konversi boolean secara explisit */
   const fetchSkills = async () => {
     setLoading(true);
     try {
@@ -475,7 +474,6 @@ export default function SkillsAdmin() {
       
       data = data.map(skill => ({
         ...skill,
-        // Pastikan konversi 1/0 MySQL ke true/false
         is_visible: Boolean(skill.is_visible === 1 || skill.is_visible === true)
       }));
       
@@ -498,14 +496,13 @@ export default function SkillsAdmin() {
       return (a.order ?? 0) - (b.order ?? 0);
     });
 
-  /* Group by category untuk tampilan grid */
   const grouped = CATEGORIES.reduce((acc, cat) => {
     const items = filtered.filter(s => s.category === cat.key);
     if (items.length > 0 || catFilter === cat.key) acc[cat.key] = items;
     return acc;
   }, {});
 
-  /* Save (create / update) dengan sinkronisasi ulang via refetch */
+  /* Save (create / update) via refetch */
   const handleSave = async (formData) => {
     if (!formData.name.trim()) {
       setToast({ type: 'error', message: 'Nama skill wajib diisi!' });
@@ -546,7 +543,6 @@ export default function SkillsAdmin() {
     }
   };
 
-  /* Delete dengan sinkronisasi ulang */
   const handleDelete = async () => {
     if (!delTarget) return;
     setDelLoading(true);
@@ -563,7 +559,6 @@ export default function SkillsAdmin() {
     }
   };
 
-  /* Toggle visibility dengan sinkronisasi ulang */
   const handleToggleVisible = async (skill) => {
     try {
       const newVal = !skill.is_visible;

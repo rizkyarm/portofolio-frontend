@@ -44,7 +44,6 @@ const INIT_FORM = {
   featured:    false,
 };
 
-/* ── CSS vars helper — injects dark/light theme ── */
 function ThemeWrapper({ dark, children }) {
   const t = dark ? {
     '--bg':        '#0f172a',
@@ -1020,11 +1019,4 @@ export default function ServicesAdmin() {
 }
 
 /* ── Dummy fallback ── */
-const dummyServices = [
-  { id:1, title:'Web Development',         icon:'monitor',    color:'#6c5ce7', price_range:'Rp 2JT - 8JT', description:'Membangun website modern & responsif.',       includes:['Desain UI/UX','REST API','Deploy'],              is_visible:true,  featured:false, order:1 },
-  { id:2, title:'Android App Development', icon:'smartphone', color:'#e84393', price_range:'Rp 3JT - 12JT',description:'Aplikasi Android cross-platform dengan Flutter.',includes:['Flutter UI','Firebase','Google Play'],           is_visible:true,  featured:false, order:2 },
-  { id:3, title:'Video Editing',           icon:'video',      color:'#636e72', price_range:'Rp 500RB - 3JT',description:'Editing video profesional Premiere & AE.',     includes:['Color grading','Motion graphics','Sound design'], is_visible:true,  featured:false, order:3 },
-  { id:4, title:'UI/UX Design',            icon:'palette',    color:'#f39c12', price_range:'Rp 1JT - 5JT', description:'Desain antarmuka intuitif menggunakan Figma.',  includes:['Wireframe','Prototype','Handoff'],               is_visible:true,  featured:false, order:4 },
-  { id:5, title:'Full-Stack Development',  icon:'code',       color:'#00b894', price_range:'Rp 5JT - 20JT',description:'Solusi end-to-end React + Laravel + MySQL.',    includes:['Frontend','Backend API','Admin panel','3 bulan maintenance'], is_visible:true, featured:true, order:5 },
-  { id:6, title:'Konsultasi & Code Review',icon:'layers',     color:'#0984e3', price_range:'Rp 200RB/jam', description:'Review kode, debugging, dan mentoring teknikal.',includes:['Code review','Problem solving','Session recording'], is_visible:false, featured:false, order:6 },
-];
+const dummyServices = [];

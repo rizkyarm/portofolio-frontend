@@ -407,33 +407,5 @@ function ProjectCard({ project, isDarkMode }) {
   );
 }
 
-/* ── Dummy projects (fallback saat API kosong) ── */
-const dummyProjects = [
-  {
-    id: 1,
-    title: 'Eco-Shop E-Commerce',
-    slug: 'eco-shop',
-    category: 'website',
-    tags: ['React', 'Tailwind CSS', 'UI Design'],
-    short_description: 'Responsive online store for sustainable products.',
-    thumbnail: null,
-  },
-  {
-    id: 2,
-    title: 'Daily Flow Task App',
-    slug: 'daily-flow',
-    category: 'android',
-    tags: ['Flutter', 'Firebase', 'Android API'],
-    short_description: 'Intuitive productivity app for personal organization.',
-    thumbnail: null,
-  },
-  {
-    id: 3,
-    title: 'Urban Explorer Vlog',
-    slug: 'urban-explorer',
-    category: 'video',
-    tags: ['Premiere Pro', 'After Effects', 'Motion Graphics'],
-    short_description: 'Dynamic travel video montage with energetic editing.',
-    thumbnail: null,
-  },
-];
+/* ── Dummy projects ── */
+const dummyProjects = [];

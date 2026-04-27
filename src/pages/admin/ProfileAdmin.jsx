@@ -192,7 +192,7 @@ export default function ProfileAdmin() {
       });
       if (d.avatar) setAvatarPreview(d.avatar);
     } catch (err) {
-      // Abaikan jika 404 (database kosong)
+      console.error('Error fetching profile:', err);
     } finally {
       setLoading(false);
     }
@@ -387,7 +387,7 @@ export default function ProfileAdmin() {
                     <div className="sm:col-span-2">
                       <Field label="Nama Lengkap" icon={User}>
                         <input type="text" value={form.name} onChange={set('name')}
-                          placeholder="Ariana Kresna" className={`${inputCls} pl-10`} />
+                          placeholder="Rizki Aditiya R" className={`${inputCls} pl-10`} />
                       </Field>
                     </div>
                     <div className="sm:col-span-2">
@@ -405,7 +405,7 @@ export default function ProfileAdmin() {
                     </div>
                     <Field label="Email" icon={Mail}>
                       <input type="email" value={form.email} onChange={set('email')}
-                        placeholder="ariana@email.com" className={`${inputCls} pl-10`} />
+                        placeholder="rizkiaditiyaramad@email.com" className={`${inputCls} pl-10`} />
                     </Field>
                     <Field label="Nomor HP" icon={Phone}>
                       <input type="text" value={form.phone} onChange={set('phone')}
@@ -413,7 +413,7 @@ export default function ProfileAdmin() {
                     </Field>
                     <Field label="Lokasi" icon={MapPin}>
                       <input type="text" value={form.location} onChange={set('location')}
-                        placeholder="Bandung, Jawa Barat" className={`${inputCls} pl-10`} />
+                        placeholder="Bandar Lampung, Lampung" className={`${inputCls} pl-10`} />
                     </Field>
                     <Field label="CV / Resume URL" icon={Link2}>
                       <input type="url" value={form.cv_url} onChange={set('cv_url')}

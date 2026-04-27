@@ -86,45 +86,6 @@ const tabs = [
 
 /* ── Dummy fallback data ── */
 const dummyProject = {
-  id: 1,
-  title: 'Daily Flow Task App',
-  slug: 'daily-flow',
-  category: 'android',
-  status: 'live',
-  short_description: 'Aplikasi produktivitas Android untuk organisasi tugas sehari-hari.',
-  description: `Daily Flow adalah aplikasi manajemen tugas yang dirancang untuk membantu 
-    pengguna mengelola aktivitas harian dengan lebih efisien. Dibangun menggunakan Flutter 
-    dan Firebase, aplikasi ini menawarkan pengalaman yang smooth dan real-time.
-
-    Proyek ini lahir dari kebutuhan pribadi akan aplikasi to-do yang sederhana namun powerful. 
-    Setelah riset pengguna, kami menemukan bahwa kebanyakan aplikasi produktivitas terlalu 
-    kompleks atau terlalu sederhana — Daily Flow hadir sebagai solusi di tengahnya.`,
-  tags: ['Flutter', 'Firebase', 'Android SDK', 'Dart'],
-  features: [
-    { name: 'Task Management',      desc: 'Kelola tugas dengan checklist yang smooth dan intuitif.' },
-    { name: 'Calendar View',        desc: 'Pantau progress pada tampilan kalender yang interaktif.' },
-    { name: 'Habit Tracker',        desc: 'Bangun kebiasaan baik dengan streak tracking harian.' },
-    { name: 'Pomodoro Timer',       desc: 'Timer bawaan untuk sesi fokus yang lebih produktif.' },
-    { name: 'Team Collaboration',   desc: 'Bagikan tugas dan pantau progress tim secara real-time.' },
-    { name: 'Smart Notifications',  desc: 'Pengingat cerdas yang menjaga kamu tetap on-track.' },
-    { name: 'Statistics Dashboard', desc: 'Visualisasi data produktivitas dalam grafik yang informatif.' },
-    { name: 'User Profiles',        desc: 'Pengaturan personal yang bisa dikustomisasi sepenuhnya.' },
-  ],
-  tech_stack: [
-    { name: 'Flutter',       role: 'Cross-platform UI',    color: '#54c5f8', icon: 'Fl' },
-    { name: 'Firebase',      role: 'Realtime DB & Auth',   color: '#f5a623', icon: 'FB' },
-    { name: 'Android SDK',   role: 'Native API Access',    color: '#3ddc84', icon: 'An' },
-    { name: 'Node.js',       role: 'Backend API',          color: '#68a063', icon: 'Nd' },
-    { name: 'Google Cal API',role: 'Calendar Sync',        color: '#4285f4', icon: 'GC' },
-    { name: 'Figma',         role: 'UI/UX Design Tools',   color: '#f24e1e', icon: 'Fg' },
-    { name: 'VS Code',       role: 'IDE',                  color: '#0078d4', icon: 'VS' },
-    { name: 'Git',           role: 'Version Control',      color: '#f05032', icon: 'Gt' },
-  ],
-  demo_url: 'https://demo.example.com',
-  repo_url: 'https://github.com',
-  thumbnail: null,
-  images: [],
-  created_at: '2024-03-15',
 };
 
 /* ── Skeleton Loader ── */
@@ -405,7 +366,6 @@ export default function ProjectDetail() {
                   />
                 </div>
               ) : (
-                /* Decorative mockup jika tidak ada gambar */
                 <div className="relative w-full max-w-sm">
                   {/* Main screen */}
                   <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-3xl p-6 shadow-2xl">
@@ -855,7 +815,6 @@ export default function ProjectDetail() {
                     isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
                   }`}
                 >
-                  {/* Bagian Gambar / Thumbnail */}
                   <div className="h-32 relative overflow-hidden bg-gray-100 dark:bg-gray-700">
                     {p.thumbnail ? (
                       <img 

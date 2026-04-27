@@ -219,7 +219,6 @@ export default function ProjectsAdmin() {
 
   useEffect(() => { fetchProjects(); }, []);
 
-  /* Reset page on filter change */
   useEffect(() => { setPage(1); }, [search, catFilter, stsFilter]);
 
   /* Filter + sort */
@@ -625,10 +624,4 @@ export default function ProjectsAdmin() {
 }
 
 /* ── Dummy data ── */
-const dummyProjects = [
-  { id:1, title:'Eco-Shop E-Commerce',  slug:'eco-shop',     category:'website', status:'live',  tags:['React','Tailwind'],        short_description:'Responsive online store.', created_at:'2024-03-01' },
-  { id:2, title:'Daily Flow Task App',  slug:'daily-flow',   category:'android', status:'live',  tags:['Flutter','Firebase'],      short_description:'Productivity app.',         created_at:'2024-02-15' },
-  { id:3, title:'Urban Explorer Vlog', slug:'urban-explorer',category:'video',   status:'draft', tags:['Premiere Pro','After FX'], short_description:'Travel video montage.',     created_at:'2024-02-01' },
-  { id:4, title:'Brand Identity Kit',  slug:'brand-kit',    category:'design',  status:'live',  tags:['Figma','Illustrator'],     short_description:'Complete branding.',        created_at:'2024-01-20' },
-  { id:5, title:'Portfolio v2',         slug:'portfolio-v2', category:'website', status:'live',  tags:['React','Laravel'],         short_description:'Personal portfolio.',       created_at:'2024-01-10' },
-];
+const dummyProjects = [];

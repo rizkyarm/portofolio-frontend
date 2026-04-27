@@ -540,15 +540,12 @@ export default function Contact() {
                     ></iframe>
 
                     {/* Overlay UI */}
-                    {/* pointer-events-none memungkinkan kursor menembus overlay agar user bisa menggeser peta */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-950/60 group-hover:bg-slate-950/20 transition-colors duration-700 pointer-events-none">
                       
-                      {/* Ikon Map Pin (Warna diganti Emerald, tidak ungu) */}
                       <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.4)] group-hover:-translate-y-4 group-hover:scale-110 transition-all duration-500">
                         <MapPin size={28} className="text-slate-950" />
                       </div>
                       
-                      {/* Teks Info - Akan memudar saat di-hover agar user bisa melihat peta dengan jelas */}
                       <div className="text-center backdrop-blur-md bg-slate-900/70 px-6 py-3 rounded-2xl border border-slate-700/50 shadow-xl group-hover:opacity-0 transition-opacity duration-500">
                         <div className="text-white font-bold text-lg">Bandar Lampung, Indonesia</div>
                         <div className="text-emerald-400 font-mono text-sm mt-1.5 tracking-wider">-5.4297° S, 105.2642° E</div>

@@ -455,16 +455,7 @@ export default function Dashboard() {
 
 /* ── Dummy fallback data ── */
 const dummyProjects = [
-  { id: 1, title: 'Eco-Shop E-Commerce', category: 'website', status: 'live',  short_description: 'Responsive online store.' },
-  { id: 2, title: 'Daily Flow Task App', category: 'android', status: 'live',  short_description: 'Productivity app.' },
-  { id: 3, title: 'Urban Explorer Vlog', category: 'video',   status: 'draft', short_description: 'Travel video montage.' },
-  { id: 4, title: 'Brand Identity Kit',  category: 'design',  status: 'live',  short_description: 'Complete branding package.' },
-  { id: 5, title: 'Portfolio v2',        category: 'website', status: 'live',  short_description: 'Personal portfolio website.' },
 ];
 
 const dummyMessages = [
-  { id: 1, name: 'Budi Santoso',  subject: 'Mau tanya soal web dev',  is_read: false, created_at: '2 jam lalu' },
-  { id: 2, name: 'Siti Rahayu',  subject: 'Request penawaran app',    is_read: false, created_at: '5 jam lalu' },
-  { id: 3, name: 'Andi Wijaya',  subject: 'Kolaborasi video project', is_read: true,  created_at: '1 hari lalu' },
-  { id: 4, name: 'Rina Kusuma',  subject: 'Konsultasi UI design',     is_read: true,  created_at: '2 hari lalu' },
 ];
