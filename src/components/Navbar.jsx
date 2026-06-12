@@ -1,239 +1,243 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDarkMode } from '../context/DarkModeContext';
 
 const navLinks = [
-  { label: 'Home',     path: '/' },
-  { label: 'Projects', path: '/projects' },
-  { label: 'Services', path: '/services' },
-  { label: 'About',    path: '/about' },
-  { label: 'Contact',  path: '/contact' },
+  { label: 'Home', path: '/', icon: HomeIcon },
+  { label: 'Projects', path: '/projects', icon: ProjectsIcon },
+  { label: 'Services', path: '/services', icon: ServicesIcon },
+  { label: 'About', path: '/about', icon: AboutIcon },
+  { label: 'Contact', path: '/contact', icon: ContactIcon },
 ];
+
+function HomeIcon({ active }) {
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      {active && <path d="M9 22V12h6v10" />}
+    </svg>
+  );
+}
+
+function ProjectsIcon({ active }) {
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+    </svg>
+  );
+}
+
+function ServicesIcon({ active }) {
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  );
+}
+
+function AboutIcon({ active }) {
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function ContactIcon({ active }) {
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  );
+}
+
+function ThemeToggle({ isDarkMode, onToggle, compact = false }) {
+  return (
+    <button
+      onClick={onToggle}
+      className={`relative flex items-center justify-center rounded-xl text-slate-400 hover:text-white transition-all duration-300 hover:bg-white/5 active:scale-90 group ${compact ? 'w-9 h-9' : 'w-10 h-10'}`}
+      aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
+    >
+      <span className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-amber-500/10 to-violet-500/10" />
+
+      <AnimatePresence mode="wait" initial={false}>
+        {isDarkMode ? (
+          <motion.svg
+            key="sun"
+            initial={{ rotate: -90, scale: 0, opacity: 0 }}
+            animate={{ rotate: 0, scale: 1, opacity: 1 }}
+            exit={{ rotate: 90, scale: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="w-[18px] h-[18px] relative z-10"
+            fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" strokeWidth={2}
+            strokeLinecap="round" strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </motion.svg>
+        ) : (
+          <motion.svg
+            key="moon"
+            initial={{ rotate: 90, scale: 0, opacity: 0 }}
+            animate={{ rotate: 0, scale: 1, opacity: 1 }}
+            exit={{ rotate: -90, scale: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="w-[18px] h-[18px] relative z-10"
+            fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" strokeWidth={2}
+            strokeLinecap="round" strokeLinejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </motion.svg>
+        )}
+      </AnimatePresence>
+    </button>
+  );
+}
 
 export default function Navbar() {
   const { pathname } = useLocation();
-  const { isDarkMode, toggleDarkMode, isLoaded } = useDarkMode();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Reset animation state when menu opens
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      setAnimationComplete(false);
-      const timer = setTimeout(() => setAnimationComplete(true), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [mobileMenuOpen]);
-
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
-
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-500 ${
-      isDarkMode 
-        ? 'bg-gray-900 border-b border-gray-800' 
-        : 'bg-white'
-    } ${scrolled ? 'shadow-lg' : 'shadow-none'}`}>
-      <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-
-        {/* Logo with subtle animation */}
-        <Link 
-          to="/" 
-          className={`font-sora font-bold text-xl transition-all duration-300 flex-shrink-0 hover:scale-110 active:scale-95 group relative ${
-            isDarkMode ? 'text-white' : 'text-gray-900 hover:text-green-800'
-          }`}
-        >
-          <span className="text-green-800 transition-all duration-300 group-hover:drop-shadow-lg">My</span> Portfolio
-        </Link>
-
-        {/* Desktop Navigation */}
-        <ul className="hidden md:flex items-center gap-1 flex-1 justify-center">
-          {navLinks.map(({ label, path }) => {
-            const isActive = pathname === path;
-            return (
-              <li key={path} className="group relative">
-                <Link
-                  to={path}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative overflow-hidden ${
-                    isActive
-                      ? isDarkMode
-                        ? 'text-green-400 bg-gray-800 shadow-md scale-105'
-                        : 'text-green-600 bg-brand-pale shadow-md scale-105'
-                      : isDarkMode
-                      ? 'text-gray-300 hover:text-gray-100 hover:bg-gray-800 hover:shadow-md hover:scale-105 active:scale-95'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-md hover:scale-105 active:scale-95'
-                  }`}
-                >
-                  {/* Animated background on hover */}
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0"></span>
-                  <span className="relative z-10 hover:text-green-400 transition-all duration-300 flex-shrink-0 hover:scale-110 active:scale-95">{label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Desktop CTA Button with animation */}
-        <Link
-          to="/contact"
-          className={`hidden md:inline-flex px-5 py-2 text-white text-sm font-semibold rounded-lg transition-all duration-300 flex-shrink-0 hover:shadow-lg hover:-translate-y-1 active:scale-95 active:translate-y-0 group relative overflow-hidden ${
-            isDarkMode
-              ? 'bg-green-600 hover:bg-green-800'
-              : 'bg-green-600 hover:bg-green-800'
-          }`}
-        >
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent to-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-          <span className="relative z-10 flex items-center gap-1 group-hover:gap-2 transition-all">Hire Me</span>
-        </Link>
-
-        {/* Dark Mode Toggle Button */}
-        <button
-          onClick={toggleDarkMode}
-          className={`hidden md:flex ml-3 p-2 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 ${
-            isDarkMode
-              ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-brand-purple'
-          }`}
-          aria-label="Toggle dark mode"
-        >
-          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-
-        {/* Mobile Menu Button with rotation animation */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className={`md:hidden p-2 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 hamburger-btn group ${
-            isDarkMode
-              ? 'text-gray-300 hover:bg-gray-800 hover:text-green-400'
-              : 'text-gray-600 hover:bg-gray-100 hover:text-green-500'
-          }`}
-          aria-label="Toggle menu"
-        >
-          <svg 
-            className={`w-6 h-6 transition-transform duration-300 ${
-              mobileMenuOpen ? 'rotate-90' : 'rotate-0'
-            } group-hover:drop-shadow-md`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+    <>
+      <header
+        className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? isDarkMode
+              ? 'bg-[#0A0A0F]/90 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/20'
+              : 'bg-white/90 backdrop-blur-xl border-b border-gray-200/50 shadow-lg shadow-black/5'
+            : isDarkMode
+              ? 'bg-[#0A0A0F]/60 backdrop-blur-lg border-b border-white/5'
+              : 'bg-white/60 backdrop-blur-lg border-b border-gray-200/30'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6 lg:px-8">
+          <Link
+            to="/"
+            className={`font-sora font-bold text-lg flex-shrink-0 group ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
           >
-            {mobileMenuOpen ? (
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M6 18L18 6M6 6l12 12"
-                className="transition-all duration-300"
-              />
-            ) : (
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M4 6h16M4 12h16M4 18h16"
-                className="transition-all duration-300"
-              />
-            )}
-          </svg>
-        </button>
-      </nav>
+            <span className="text-emerald-400 group-hover:text-emerald-300 transition-colors">My</span>
+            <span className={`transition-colors ${isDarkMode ? 'group-hover:text-slate-200' : 'group-hover:text-gray-700'}`}> Portfolio</span>
+          </Link>
 
-      {/* Mobile Navigation Menu with smooth animation */}
-      {mobileMenuOpen && (
-        <div 
-          className={`md:hidden border-t transition-all duration-300 ${
-            isDarkMode
-              ? 'bg-gray-900 border-gray-800'
-              : 'bg-white border-gray-200'
-          }`}
-          style={{ animation: 'slideInDown 0.25s ease-out forwards' }}
-        >
-          <div className="max-w-6xl mx-auto px-6 py-4">
-            <ul className={`flex flex-col gap-2 ${!animationComplete ? 'pointer-events-none' : ''}`}>
+          <nav className="absolute left-1/2 -translate-x-1/2">
+            <ul className="flex items-stretch gap-1">
               {navLinks.map(({ label, path }) => {
-                const isActive = pathname === path;
+                const isActive = pathname === path || (path !== '/' && pathname.startsWith(path));
                 return (
-                  <li 
-                    key={path}
-                    style={{
-                      animation: 'slideInLeft 0.25s ease-out forwards',
-                      opacity: animationComplete ? 1 : 0,
-                      transform: animationComplete ? 'translateX(0)' : 'translateX(-20px)',
-                    }}
-                  >
+                  <li key={path} className="flex">
                     <Link
                       to={path}
-                      className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 relative overflow-hidden group ${
+                      className={`relative flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                         isActive
-                          ? isDarkMode
-                            ? 'text-green-400 bg-gray-800 shadow-md translate-x-2'
-                            : 'text-green-500 bg-green-100 shadow-md translate-x-2'
+                          ? 'text-emerald-400'
                           : isDarkMode
-                          ? 'text-gray-300 hover:text-gray-100 hover:bg-gray-800 hover:shadow-md hover:scale-105 hover:-translate-y-0.5 active:scale-95'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:shadow-md hover:scale-105 hover:-translate-y-0.5 active:scale-95'
+                            ? 'text-slate-400 hover:text-white hover:bg-white/5'
+                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                       }`}
                     >
-                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 -translate-x-full group-hover:translate-x-full transition-all duration-500"></span>
-                      <span className="relative z-10 flex items-center gap-2">
-                        {label}
-                        {isActive && <span className="inline-block animate-pulse text-green-500">✓</span>}
-                      </span>
+                      {label}
+                      {isActive && (
+                        <motion.span
+                          layoutId="desktop-nav-indicator"
+                          className="absolute bottom-1 left-3 right-3 h-0.5 bg-emerald-400 rounded-full"
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        />
+                      )}
                     </Link>
                   </li>
                 );
               })}
             </ul>
+          </nav>
 
-            <div className="flex gap-2 mt-4">
-              {/* Mobile CTA Button with animation */}
-              <Link
-                to="/contact"
-                className={`flex-1 px-4 py-3 text-center text-sm font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden ${
-                  isDarkMode
-                    ? 'bg-green-500 text-white hover:bg-green-600'
-                    : 'bg-green-500 text-white hover:bg-green-700'
-                } ${!animationComplete ? 'pointer-events-none' : ''}`}
-                style={{
-                  animation: 'slideInLeft 0.25s ease-out forwards',
-                  opacity: animationComplete ? 1 : 0,
-                  transform: animationComplete ? 'translateX(0)' : 'translateX(-20px)',
-                }}
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent to-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-                <span className="relative z-10">Hire Me</span>
-              </Link>
-
-              {/* Mobile Dark Mode Toggle */}
-              <button
-                onClick={toggleDarkMode}
-                className={`p-3 rounded-lg transition-all duration-300 ${
-                  isDarkMode
-                    ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-green-500'
-                } ${!animationComplete ? 'pointer-events-none' : ''}`}
-                aria-label="Toggle dark mode"
-                style={{
-                  animation: 'slideInLeft 0.25s ease-out forwards',
-                  opacity: animationComplete ? 1 : 0,
-                  transform: animationComplete ? 'translateX(0)' : 'translateX(-20px)',
-                }}
-              >
-                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-            </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleDarkMode} compact />
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/20 active:scale-95"
+            >
+              Hire Me
+            </Link>
           </div>
         </div>
-      )}
-    </header>
+      </header>
+
+      <nav
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isDarkMode
+            ? 'bg-transparent backdrop-blur-sm border-t border-emerald-500/5'
+            : 'bg-transparent backdrop-blur-sm border-t border-emerald-200/30'
+        }`}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
+      >
+        <div className="flex items-center justify-around h-16 px-1">
+          {navLinks.map(({ label, path, icon: Icon }) => {
+            const isActive = pathname === path || (path !== '/' && pathname.startsWith(path));
+            return (
+              <Link
+                key={path}
+                to={path}
+                className={`relative flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-1 rounded-xl transition-all duration-200 active:scale-90 tap-highlight-transparent ${
+                  isActive
+                    ? 'text-emerald-400'
+                    : isDarkMode
+                      ? 'text-slate-500 hover:text-slate-300'
+                      : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="mobile-nav-bg"
+                    className={`absolute inset-1 rounded-xl -z-10 ${
+                      isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'
+                    }`}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <div className="relative">
+                  <Icon active={isActive} />
+                </div>
+                <span className={`text-[10px] font-semibold leading-none transition-all duration-300 ${
+                  isActive ? 'opacity-100' : 'opacity-70'
+                }`}>
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
+
+          <div className="flex flex-col items-center justify-center min-w-[48px]">
+            <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleDarkMode} compact />
+          </div>
+        </div>
+      </nav>
+
+      <div className="md:hidden h-16" />
+    </>
   );
 }

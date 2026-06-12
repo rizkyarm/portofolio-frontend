@@ -9,7 +9,6 @@ import {
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-/* ── Icon map ── */
 const ICONS = {
   monitor:    { component: Monitor,    label: 'Monitor' },
   smartphone: { component: Smartphone, label: 'Phone' },
@@ -81,7 +80,6 @@ function ThemeWrapper({ dark, children }) {
   );
 }
 
-/* ── Toast ── */
 function Toast({ toast, onClose, dark }) {
   useEffect(() => {
     if (!toast) return;
@@ -101,7 +99,6 @@ function Toast({ toast, onClose, dark }) {
   );
 }
 
-/* ── Delete Modal ── */
 function DeleteModal({ service, onConfirm, onCancel, loading, dark }) {
   if (!service) return null;
   return (
@@ -150,7 +147,6 @@ function DeleteModal({ service, onConfirm, onCancel, loading, dark }) {
   );
 }
 
-/* ── Service Form Modal ── */
 function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
   const isEdit = Boolean(service);
   const [form, setForm] = useState({
@@ -205,7 +201,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
         className="rounded-3xl w-full max-w-2xl shadow-2xl border overflow-hidden"
         style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
       >
-        {/* Header */}
+        
         <div
           className="flex items-center justify-between px-6 py-4 border-b"
           style={{ borderColor: 'var(--border)' }}
@@ -238,7 +234,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
         <div className="overflow-y-auto max-h-[70vh]">
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            {/* Title */}
+            
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>
                 Judul Layanan <span className="text-red-400">*</span>
@@ -253,7 +249,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
               />
             </div>
 
-            {/* Description */}
+            
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>
                 Deskripsi
@@ -268,7 +264,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
               />
             </div>
 
-            {/* Icon picker */}
+            
             <div>
               <label className="block text-sm font-semibold mb-2" style={labelStyle}>
                 Icon
@@ -294,7 +290,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
               </div>
             </div>
 
-            {/* Color picker */}
+            
             <div>
               <label className="block text-sm font-semibold mb-2" style={labelStyle}>
                 Warna Tema
@@ -314,7 +310,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
                   />
                 ))}
               </div>
-              {/* Custom color */}
+              
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -333,7 +329,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
                 />
               </div>
 
-              {/* Preview card mini */}
+              
               <div
                 className="mt-3 rounded-xl p-3 border flex items-center gap-2.5"
                 style={{ borderColor: form.color + '40', background: form.color + '10' }}
@@ -355,7 +351,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
               </div>
             </div>
 
-            {/* Price range */}
+            
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>
                 Range Harga
@@ -377,7 +373,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
               </div>
             </div>
 
-            {/* Order */}
+            
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={labelStyle}>
                 Urutan
@@ -392,7 +388,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
               />
             </div>
 
-            {/* Includes list */}
+            
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold mb-2" style={labelStyle}>
                 Yang Termasuk dalam Layanan
@@ -438,9 +434,9 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
               </div>
             </div>
 
-            {/* Toggles */}
+            
             <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Visibility */}
+              
               <button
                 type="button"
                 onClick={() => setDirect('is_visible', !form.is_visible)}
@@ -471,7 +467,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
                 </div>
               </button>
 
-              {/* Featured */}
+              
               <button
                 type="button"
                 onClick={() => setDirect('featured', !form.featured)}
@@ -508,7 +504,7 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
           </div>
         </div>
 
-        {/* Footer */}
+        
         <div
           className="flex gap-3 px-6 py-4 border-t"
           style={{ borderColor: 'var(--border)', background: 'var(--bg3)' }}
@@ -537,7 +533,6 @@ function ServiceFormModal({ service, onSave, onClose, saving, dark }) {
   );
 }
 
-/* ── Service Card ── */
 function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
   const IconComp = ICONS[service.icon]?.component || Wrench;
   const clr      = service.color || '#6c5ce7';
@@ -552,10 +547,10 @@ function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
         boxShadow:    service.featured ? `0 0 0 2px ${clr}30` : undefined,
       }}
     >
-      {/* Top color bar */}
+      
       <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${clr}, ${clr}88)` }} />
 
-      {/* Featured badge */}
+      
       {service.featured && (
         <div
           className="absolute top-4 right-4 text-white text-xs font-bold px-2.5 py-1 rounded-full"
@@ -566,7 +561,7 @@ function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
       )}
 
       <div className="p-5">
-        {/* Icon + title */}
+        
         <div className="flex items-start gap-3 mb-4">
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
@@ -592,7 +587,7 @@ function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
           </div>
         </div>
 
-        {/* Description */}
+        
         {service.description && (
           <p
             className="text-xs leading-relaxed mb-4 line-clamp-2"
@@ -602,7 +597,7 @@ function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
           </p>
         )}
 
-        {/* Includes */}
+        
         {includes.length > 0 && (
           <div className="flex flex-col gap-1.5 mb-4">
             {includes.slice(0, 3).map((item, i) => (
@@ -619,12 +614,12 @@ function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
           </div>
         )}
 
-        {/* Footer actions */}
+        
         <div
           className="flex items-center justify-between pt-3 border-t"
           style={{ borderColor: 'var(--border)' }}
         >
-          {/* Visibility indicator */}
+          
           <div className="flex items-center gap-1.5">
             <div className={`w-2 h-2 rounded-full ${service.is_visible ? 'bg-emerald-400' : 'bg-gray-400'}`} />
             <span className="text-xs" style={{ color: 'var(--text3)' }}>
@@ -632,7 +627,7 @@ function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
             </span>
           </div>
 
-          {/* Action buttons */}
+          
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => onToggleVisible(service)}
@@ -665,7 +660,6 @@ function ServiceCard({ service, onEdit, onDelete, onToggleVisible, dark }) {
   );
 }
 
-/* ── Skeleton Card ── */
 function SkeletonCard({ dark }) {
   return (
     <div
@@ -692,7 +686,6 @@ function SkeletonCard({ dark }) {
   );
 }
 
-/* ── Main Component ── */
 export default function ServicesAdmin() {
   const { isDarkMode: dark } = useDarkMode();
   const [services,   setServices]  = useState([]);
@@ -706,7 +699,7 @@ export default function ServicesAdmin() {
   const [delLoading, setDelLoading]= useState(false);
   const [toast,      setToast]     = useState(null);
 
-  /* Fetch */
+  
   const fetchServices = async () => {
     setLoading(true);
     try {
@@ -722,7 +715,7 @@ export default function ServicesAdmin() {
 
   useEffect(() => { fetchServices(); }, []);
 
-  /* Filter + sort */
+  
   const filtered = services
     .filter(s => {
       if (filter === 'visible') return s.is_visible;
@@ -736,7 +729,7 @@ export default function ServicesAdmin() {
       return (a.order || 0) - (b.order || 0);
     });
 
-  /* Save */
+  
   const handleSave = async (formData) => {
     if (!formData.title.trim()) {
       setToast({ type: 'error', message: 'Judul layanan wajib diisi!' });
@@ -779,7 +772,7 @@ export default function ServicesAdmin() {
     }
   };
 
-  /* Delete */
+  
   const handleDelete = async () => {
     if (!delTarget) return;
     setDelLoading(true);
@@ -795,7 +788,7 @@ export default function ServicesAdmin() {
     }
   };
 
-  /* Toggle visibility */
+  
   const handleToggleVisible = async (service) => {
     const newVal = !service.is_visible;
     try {
@@ -812,7 +805,7 @@ export default function ServicesAdmin() {
     }
   };
 
-  /* Stats */
+  
   const totalVisible  = services.filter(s => s.is_visible).length;
   const totalFeatured = services.filter(s => s.featured).length;
 
@@ -824,7 +817,6 @@ export default function ServicesAdmin() {
       >
         <div className="p-6 md:p-8 max-w-7xl mx-auto">
 
-          {/* ── Header ── */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <h1
@@ -850,7 +842,6 @@ export default function ServicesAdmin() {
             </div>
           </div>
 
-          {/* ── Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {[
               { label: 'Total',      value: services.length,  color: '#6c5ce7', icon: Wrench },
@@ -884,12 +875,11 @@ export default function ServicesAdmin() {
             ))}
           </div>
 
-          {/* ── Filter & Sort bar ── */}
           <div
             className="flex flex-wrap items-center gap-3 p-4 rounded-2xl border mb-6"
             style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
           >
-            {/* Filter tabs */}
+            
             <div
               className="flex gap-1 p-1 rounded-xl"
               style={{ background: 'var(--bg3)' }}
@@ -915,7 +905,7 @@ export default function ServicesAdmin() {
               ))}
             </div>
 
-            {/* Sort */}
+            
             <div className="ml-auto flex items-center gap-2">
               <ArrowUpDown size={13} style={{ color: 'var(--text3)' }} />
               <select
@@ -935,7 +925,6 @@ export default function ServicesAdmin() {
             </div>
           </div>
 
-          {/* ── Grid ── */}
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -990,7 +979,6 @@ export default function ServicesAdmin() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
       {showModal && (
         <ServiceFormModal
           service={editTarget}
@@ -1018,5 +1006,4 @@ export default function ServicesAdmin() {
   );
 }
 
-/* ── Dummy fallback ── */
 const dummyServices = [];

@@ -1,15 +1,13 @@
-import { Suspense } from 'react';
 import { AuthProvider } from './context/AuthContext';
-import AppRouter        from './routes/AppRouter';
+import { HelmetProvider } from 'react-helmet-async';
+import AppRouter from './routes/AppRouter';
 
 export default function App() {
-  console.log('App component rendered');
-  
   return (
-    <Suspense fallback={<div style={{padding: '20px', textAlign: 'center'}}>Loading...</div>}>
+    <HelmetProvider>
       <AuthProvider>
         <AppRouter />
       </AuthProvider>
-    </Suspense>
+    </HelmetProvider>
   );
 }

@@ -8,12 +8,10 @@ import {
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-/* ── Skeleton ── */
 function Skeleton({ className = '', isDarkMode }) {
   return <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse rounded-xl ${className}`} />;
 }
 
-/* ── Stat Card ── */
 function StatCard({ icon: Icon, label, value, sub, color, loading, to, isDarkMode }) {
   const card = (
     <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl border p-5 ${isDarkMode ? 'hover:border-gray-600' : 'hover:shadow-md'} transition-all group ${to ? 'cursor-pointer' : ''}`}>
@@ -52,7 +50,6 @@ function StatCard({ icon: Icon, label, value, sub, color, loading, to, isDarkMod
   return to ? <Link to={to}>{card}</Link> : card;
 }
 
-/* ── Status Badge ── */
 function StatusBadge({ status }) {
   const map = {
     live:  { label: 'Live',  className: 'bg-green-100 text-green-700' },
@@ -66,7 +63,6 @@ function StatusBadge({ status }) {
   );
 }
 
-/* ── Category Badge ── */
 function CategoryBadge({ category }) {
   const map = {
     website: { label: 'Website',  className: 'bg-indigo-100 text-indigo-700' },
@@ -82,7 +78,6 @@ function CategoryBadge({ category }) {
   );
 }
 
-/* ── Main Component ── */
 export default function Dashboard() {
   const { isDarkMode } = useDarkMode();
   const [stats,    setStats]    = useState(null);
@@ -115,7 +110,6 @@ export default function Dashboard() {
         });
       })
       .catch(() => {
-        /* Fallback dummy */
         setStats({ projects: 24, live: 18, unread: 3, messages: 12, skills: 9, services: 6 });
         setProjects(dummyProjects);
         setMessages(dummyMessages);
@@ -129,7 +123,6 @@ export default function Dashboard() {
   return (
     <div className={`p-6 md:p-8 max-w-full mx-auto ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
 
-      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} mb-0.5`}>{greeting} 👋</p>
@@ -146,7 +139,6 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* ── Stat Cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
           icon={FolderOpen}
@@ -190,10 +182,8 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* ── Main Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* ── Recent Projects Table ── */}
         <div className={`lg:col-span-2 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl border overflow-hidden`}>
           <div className={`flex items-center justify-between px-5 py-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
             <div>
@@ -293,10 +283,8 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ── Right Column ── */}
         <div className="flex flex-col gap-5">
 
-          {/* Overview donut-style */}
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl border p-5`}>
             <h2 className={`font-sora font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
               Project Overview
@@ -335,7 +323,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Recent Messages */}
           <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl border overflow-hidden flex-1`}>
             <div className={`flex items-center justify-between px-5 py-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
               <div>
@@ -375,7 +362,6 @@ export default function Dashboard() {
                       !msg.is_read ? (isDarkMode ? 'bg-brand-purple/10' : 'bg-brand-pale/20') : (isDarkMode ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50/50')
                     }`}
                   >
-                    {/* Avatar */}
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-purple to-brand-light flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                       {msg.name?.charAt(0).toUpperCase()}
                     </div>
@@ -403,7 +389,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Quick Actions ── */}
       <div className={`mt-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl border p-5`}>
         <h2 className={`font-sora font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
           Quick Actions

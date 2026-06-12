@@ -1,57 +1,70 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainLayout    from '../layouts/MainLayout';
-import AdminLayout   from '../layouts/AdminLayout';
-import PrivateRoute  from './PrivateRoute';
+import MainLayout from '../layouts/MainLayout';
+import PrivateRoute from './PrivateRoute';
 
-import Home          from '../pages/Home';
-import Projects      from '../pages/Projects';
-import ProjectDetail from '../pages/ProjectDetail';
-import Services      from '../pages/Services';
-import About         from '../pages/About';
-import Contact       from '../pages/Contact';
+const Home          = lazy(() => import('../pages/Home'));
+const Projects      = lazy(() => import('../pages/Projects'));
+const ProjectDetail = lazy(() => import('../pages/ProjectDetail'));
+const Services      = lazy(() => import('../pages/Services'));
+const About         = lazy(() => import('../pages/About'));
+const Contact       = lazy(() => import('../pages/Contact'));
+const NotFound      = lazy(() => import('../pages/NotFound'));
+const Login         = lazy(() => import('../pages/admin/Login'));
 
-import Login          from '../pages/admin/Login';
-import Dashboard      from '../pages/admin/Dashboard';
-import ProjectsAdmin  from '../pages/admin/ProjectsAdmin';
-import ProjectForm    from '../pages/admin/ProjectForm';
-import SkillsAdmin    from '../pages/admin/SkillsAdmin';
-import ServicesAdmin  from '../pages/admin/ServicesAdmin';
-import MessagesAdmin  from '../pages/admin/MessagesAdmin';
-import ProfileAdmin   from '../pages/admin/ProfileAdmin';
+const AdminLayout   = lazy(() => import('../layouts/AdminLayout'));
+const Dashboard     = lazy(() => import('../pages/admin/Dashboard'));
+const ProjectsAdmin = lazy(() => import('../pages/admin/ProjectsAdmin'));
+const ProjectForm   = lazy(() => import('../pages/admin/ProjectForm'));
+const SkillsAdmin   = lazy(() => import('../pages/admin/SkillsAdmin'));
+const ServicesAdmin = lazy(() => import('../pages/admin/ServicesAdmin'));
+const MessagesAdmin = lazy(() => import('../pages/admin/MessagesAdmin'));
+const ProfileAdmin  = lazy(() => import('../pages/admin/ProfileAdmin'));
+
+function PageLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#0A0A0F]">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+        <p className="text-sm text-gray-500 font-medium">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
 
-        {/* Public */}
-        <Route element={<MainLayout />}>
-          <Route path="/"                element={<Home />} />
-          <Route path="/projects"        element={<Projects />} />
-          <Route path="/projects/:slug"  element={<ProjectDetail />} />
-          <Route path="/services"        element={<Services />} />
-          <Route path="/about"           element={<About />} />
-          <Route path="/contact"         element={<Contact />} />
-        </Route>
+          <Route element={<MainLayout />}>
+            <Route path="/"               element={<Home />} />
+            <Route path="/projects"       element={<Projects />} />
+            <Route path="/projects/:slug" element={<ProjectDetail />} />
+            <Route path="/services"       element={<Services />} />
+            <Route path="/about"          element={<About />} />
+            <Route path="/contact"        element={<Contact />} />
+            <Route path="*"               element={<NotFound />} />
+          </Route>
 
-        {/* Auth */}
-        <Route path="/admin/login" element={<Login />} />
+          <Route path="/admin/login" element={<Login />} />
 
-        {/* Admin protected */}
-        <Route path="/admin" element={
-          <PrivateRoute><AdminLayout /></PrivateRoute>
-        }>
-          <Route index                    element={<Dashboard />} />
-          <Route path="projects"          element={<ProjectsAdmin />} />
-          <Route path="projects/create"   element={<ProjectForm />} />
-          <Route path="projects/:id/edit" element={<ProjectForm />} />
-          <Route path="skills"            element={<SkillsAdmin />} />
-          <Route path="services"          element={<ServicesAdmin />} />
-          <Route path="messages"          element={<MessagesAdmin />} />
-          <Route path="profile"           element={<ProfileAdmin />} />
-        </Route>
+          <Route path="/admin" element={
+            <PrivateRoute><AdminLayout /></PrivateRoute>
+          }>
+            <Route index                    element={<Dashboard />} />
+            <Route path="projects"          element={<ProjectsAdmin />} />
+            <Route path="projects/create"   element={<ProjectForm />} />
+            <Route path="projects/:id/edit" element={<ProjectForm />} />
+            <Route path="skills"            element={<SkillsAdmin />} />
+            <Route path="services"          element={<ServicesAdmin />} />
+            <Route path="messages"          element={<MessagesAdmin />} />
+            <Route path="profile"           element={<ProfileAdmin />} />
+          </Route>
 
-      </Routes>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

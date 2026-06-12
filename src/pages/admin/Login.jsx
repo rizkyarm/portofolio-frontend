@@ -4,13 +4,13 @@ import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Login() {
-  const { login, user }       = useAuth();
-  const navigate              = useNavigate();
-  const [form, setForm]       = useState({ email: '', password: '' });
-  const [errors, setErrors]   = useState({});
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
   const [showPass, setShowPass] = useState(false);
-  const [status, setStatus]   = useState('idle'); 
-  const [errMsg, setErrMsg]   = useState('');
+  const [status, setStatus] = useState('idle');
+  const [errMsg, setErrMsg] = useState('');
 
   useEffect(() => {
     if (user) navigate('/admin', { replace: true });
@@ -21,7 +21,7 @@ export default function Login() {
 
   const validate = () => {
     const e = {};
-    if (!form.email.trim())    e.email    = 'Email wajib diisi';
+    if (!form.email.trim()) e.email = 'Email wajib diisi';
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Format email tidak valid';
     if (!form.password.trim()) e.password = 'Password wajib diisi';
     else if (form.password.length < 6) e.password = 'Password minimal 6 karakter';
@@ -40,7 +40,9 @@ export default function Login() {
       navigate('/admin', { replace: true });
     } catch (err) {
       setStatus('error');
+      // Show friendly message for rate-limiting, server message, or generic fallback
       setErrMsg(
+        err?.friendlyMessage ||
         err?.response?.data?.message ||
         err?.response?.data?.errors?.email?.[0] ||
         'Email atau password salah. Silakan coba lagi.'
@@ -75,7 +77,7 @@ export default function Login() {
         {/* Logo */}
         <div className="relative">
           <Link to="/" className="inline-flex items-center gap-2">
-            <span className="font-sora font-bold text-2xl text-brand-light">AK</span>
+            <span className="font-sora font-bold text-2xl text-brand-light">My</span>
             <span className="font-sora font-bold text-2xl text-white">Portfolio</span>
           </Link>
         </div>
@@ -183,11 +185,10 @@ export default function Login() {
                     value={form.email}
                     onChange={update('email')}
                     autoComplete="email"
-                    className={`${inputBase} ${
-                      errors.email
+                    className={`${inputBase} ${errors.email
                         ? 'border-red-300 ring-2 ring-red-100'
                         : 'border-gray-200'
-                    }`}
+                      }`}
                   />
                 </div>
                 {errors.email && (
@@ -215,11 +216,10 @@ export default function Login() {
                     value={form.password}
                     onChange={update('password')}
                     autoComplete="current-password"
-                    className={`${inputBase} pr-11 ${
-                      errors.password
+                    className={`${inputBase} pr-11 ${errors.password
                         ? 'border-red-300 ring-2 ring-red-100'
                         : 'border-gray-200'
-                    }`}
+                      }`}
                   />
                   <button
                     type="button"
@@ -257,8 +257,6 @@ export default function Login() {
               </button>
 
             </form>
-
-            
 
             {/* Back to site */}
             <div className="mt-6 text-center">

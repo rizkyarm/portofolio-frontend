@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, MapPin, Mail, Phone,
   Download, Calendar, Award, Coffee,
 } from 'lucide-react';
-import api from '../services/api';
 import { useDarkMode } from '../context/DarkModeContext';
+import SEO from '../components/shared/SEO';
+import useApiCache from '../hooks/useApiCache';
 
 /* ── Kategori config ── */
 const CATEGORIES = [
@@ -101,47 +102,44 @@ function Reveal({ children, className = '', delay = 0 }) {
 /* ── Main Component ── */
 export default function About() {
   const { isDarkMode } = useDarkMode();
-  const [profile, setProfile] = useState(null);
-  const [skills, setSkills] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  /* ── Ambil Data dari API ── */
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [profileRes, skillsRes] = await Promise.all([
-          api.get('/profile'),
-          api.get('/skills')
-        ]);
-
-        const profileData = profileRes.data.data || profileRes.data;
-        
-        // PERBAIKAN 1: Fallback ke Object {} bukan Array []
-        const parsedStats = typeof profileData.stats === 'string' 
-          ? JSON.parse(profileData.stats) 
-          : (profileData.stats || {});
-          
-        setProfile({ ...profileData, stats: parsedStats });
-
-        const skillsData = skillsRes.data.data || skillsRes.data || [];
-        setSkills(skillsData);
-
-      } catch (error) {
-        console.error("Gagal mengambil data dari server:", error);
-      } finally {
-        setLoading(false);
+  
+  // Fetch profile with stats parsing
+  const { data: profile = null, loading: profLoading, error: profError, fromCache: profCache } = useApiCache('/profile', {
+    transform: (res) => {
+      const raw = res.data?.data || res.data;
+      if (raw?.stats && typeof raw.stats === 'string') {
+        try { 
+          raw.stats = JSON.parse(raw.stats); 
+        } catch (e) { 
+          console.warn('[About] Failed to parse stats JSON:', e);
+          raw.stats = {}; 
+        }
       }
-    };
-    fetchData();
-  }, []);
+      return raw || null;
+    },
+    initialValue: null,
+  });
 
-  if (loading) {
+  // Fetch skills
+  const { data: skills = [], loading: skillLoading, error: skillError, fromCache: skillCache } = useApiCache('/skills', { 
+    initialValue: [] 
+  });
+
+  const loading = profLoading || skillLoading;
+  const offline = profCache || skillCache;
+
+  // Handle loading state
+  if (loading && !profile && !skills.length) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
         <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  // Handle error state
+  if (profError || skillError) {
+    console.error('[About] Error loading data:', { profError, skillError });
   }
 
   
@@ -168,6 +166,11 @@ export default function About() {
 
   return (
     <div className="overflow-x-hidden">
+      <SEO
+        title="About"
+        description="Learn more about Rizki Aditiya Ramadan — a creative developer with expertise in web development, mobile apps, video production, and UI/UX design."
+        path="/about"
+      />
 
       {/* ══ HERO ══ */}
       <section className={`relative ${isDarkMode ? 'bg-gray-900' : 'bg-brand-navy'} min-h-screen flex items-center overflow-hidden`}>

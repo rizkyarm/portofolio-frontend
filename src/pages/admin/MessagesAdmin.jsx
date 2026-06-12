@@ -8,7 +8,6 @@ import {
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-/* ── Toast ── */
 function Toast({ toast, onClose }) {
   useEffect(() => {
     if (!toast) return;
@@ -29,7 +28,6 @@ function Toast({ toast, onClose }) {
   );
 }
 
-/* ── Delete Modal ── */
 function DeleteModal({ message, onConfirm, onCancel, loading, isDarkMode }) {
   if (!message) return null;
   return (
@@ -62,7 +60,6 @@ function DeleteModal({ message, onConfirm, onCancel, loading, isDarkMode }) {
   );
 }
 
-/* ── Message Detail Panel ── */
 function MessageDetail({ message, onClose, onMarkRead, onDelete, isDarkMode }) {
   if (!message) return null;
   const initials = message.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
@@ -73,7 +70,7 @@ function MessageDetail({ message, onClose, onMarkRead, onDelete, isDarkMode }) {
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className={`rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg shadow-2xl border overflow-hidden ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
 
-        {/* Header */}
+        
         <div className={`flex items-center gap-3 px-6 py-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
             style={{ background: color }}>
@@ -93,7 +90,7 @@ function MessageDetail({ message, onClose, onMarkRead, onDelete, isDarkMode }) {
           </button>
         </div>
 
-        {/* Body */}
+        
         <div className="p-6">
           {message.subject && (
             <div className="mb-4">
@@ -115,7 +112,7 @@ function MessageDetail({ message, onClose, onMarkRead, onDelete, isDarkMode }) {
             </div>
           </div>
 
-          {/* Meta */}
+          
           <div className={`flex flex-wrap items-center gap-3 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
             <div className="flex items-center gap-1.5">
               <Clock size={12} />
@@ -130,7 +127,7 @@ function MessageDetail({ message, onClose, onMarkRead, onDelete, isDarkMode }) {
           </div>
         </div>
 
-        {/* Actions */}
+        
         <div className="flex gap-3 px-6 pb-6">
           <a
             href={`https://mail.google.com/mail/?view=cm&fs=1&to=${message.email}&su=Re: ${message.subject || 'Pesan dari Portfolio'}`}
@@ -159,7 +156,6 @@ function MessageDetail({ message, onClose, onMarkRead, onDelete, isDarkMode }) {
 
 const PER_PAGE = 10;
 
-/* ── Main Component ── */
 export default function MessagesAdmin() {
   const { isDarkMode } = useDarkMode();
   
@@ -192,7 +188,7 @@ export default function MessagesAdmin() {
   useEffect(() => { fetchMessages(); }, []);
   useEffect(() => { setPage(1); }, [search, filter]);
 
-  /* Filter */
+  
   const filtered = messages.filter(m => {
     const q = search.toLowerCase();
     const matchSearch = !search ||
@@ -262,7 +258,6 @@ export default function MessagesAdmin() {
   return (
     <div className={`p-6 md:p-8 max-w-full mx-auto h-full ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
 
-      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className={`font-sora font-bold text-2xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -294,7 +289,6 @@ export default function MessagesAdmin() {
         </div>
       </div>
 
-      {/* ── Stats ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {[
           { label: 'Total Pesan',   value: messages.length, color: 'text-brand-purple', bg: isDarkMode ? 'bg-brand-purple/20' : 'bg-brand-purple/10' },
@@ -315,7 +309,6 @@ export default function MessagesAdmin() {
         ))}
       </div>
 
-      {/* ── Search + Filter ── */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="relative flex-1">
           <Search size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
@@ -352,7 +345,6 @@ export default function MessagesAdmin() {
         </div>
       </div>
 
-      {/* ── Message List ── */}
       <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
 
         {loading ? (
@@ -446,7 +438,6 @@ export default function MessagesAdmin() {
         )}
       </div>
 
-      {/* ── Pagination ── */}
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
           <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -482,7 +473,6 @@ export default function MessagesAdmin() {
         </div>
       )}
 
-      {/* ── Modals ── */}
       {selected && (
         <MessageDetail
           message={selected}

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Monitor, Smartphone, Video, Palette, Code, Layers } from 'lucide-react';
 import { useDarkMode } from '../context/DarkModeContext';
-import api from '../services/api';
+import SEO from '../components/shared/SEO';
+import useApiCache from '../hooks/useApiCache';
 
 const iconMap = {
   monitor:    Monitor,
@@ -40,25 +41,18 @@ const processSteps = [
 
 export default function Services() {
   const { isDarkMode } = useDarkMode();
-  const [services, setServices]   = useState([]);
-  const [loading,  setLoading]    = useState(true);
-
-  useEffect(() => {
-    api.get('/services')
-      .then((res) => {
-        const data = res.data.data || res.data;
-        setServices(data.length > 0 ? data : dummyServices);
-      })
-      .catch(() => setServices(dummyServices))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: services = [], loading } = useApiCache('/services', { initialValue: [] });
 
   const displayServices = loading ? [] : services;
 
   return (
     <div className={isDarkMode ? 'bg-gray-900' : 'bg-white'}>
+      <SEO
+        title="Services"
+        description="Professional services in web development, mobile app development, video production, and graphic design."
+        path="/services"
+      />
 
-      {/* ── HERO ── */}
       <section className={`py-20 ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-purple-50 via-white to-blue-50'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className={`inline-block text-xs font-semibold text-green-600 uppercase tracking-widest px-3 py-1.5 rounded-full mb-4 ${
@@ -80,7 +74,6 @@ export default function Services() {
         </div>
       </section>
 
-      {/* ── SERVICES GRID ── */}
       <section className={`max-w-6xl mx-auto px-6 py-20 ${
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       }`}>
@@ -112,18 +105,18 @@ export default function Services() {
                       : ''
                   }`}
                 >
-                  {/* Featured badge */}
+                  
                   {isFeatured && (
                     <div className="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                       Most Popular
                     </div>
                   )}
 
-                  {/* Top gradient bar */}
+                  
                   <div className={`h-2 w-full bg-gradient-to-r ${service.color || 'from-green-600 to-green-400'}`} />
 
                   <div className="p-6">
-                    {/* Icon */}
+                    
                     <div className={`w-12 h-12 rounded-xl ${service.bgLight || 'bg-brand-pale'} flex items-center justify-center mb-4`}>
                       <IconComponent
                         size={22}
@@ -131,7 +124,7 @@ export default function Services() {
                       />
                     </div>
 
-                  {/* Title & price */}
+                  
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <h3 className={`font-sora font-bold text-lg leading-tight ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
@@ -145,14 +138,14 @@ export default function Services() {
                       </span>
                     </div>
 
-                    {/* Description */}
+                    
                     <p className={`text-sm leading-relaxed mb-5 ${
                       isDarkMode ? 'text-gray-400' : 'text-gray-400'
                     }`}>
                       {service.description}
                     </p>
 
-                    {/* Includes list */}
+                    
                     <ul className="flex flex-col gap-2 mb-6">
                       {includes.slice(0, 5).map((item) => (
                         <li
@@ -170,7 +163,7 @@ export default function Services() {
                       ))}
                     </ul>
 
-                    {/* CTA */}
+                    
                     <Link
                       to="/contact"
                       className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
@@ -192,7 +185,6 @@ export default function Services() {
         )}
       </section>
 
-      {/* ── PROCESS ── */}
       <section className={`py-20 ${
         isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
       }`}>
@@ -211,7 +203,7 @@ export default function Services() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {processSteps.map((step, idx) => (
               <div key={step.num} className="relative">
-                {/* Connector line */}
+                
                 {idx < processSteps.length - 1 && (
                   <div className={`hidden md:block absolute top-8 left-full w-full h-px z-0 ${
                     isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
@@ -243,7 +235,6 @@ export default function Services() {
         </div>
       </section>
 
-      {/* ── FAQ ── */}
       <section className={`max-w-3xl mx-auto px-6 py-20 ${
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       }`}>
@@ -265,7 +256,6 @@ export default function Services() {
         </div>
       </section>
 
-      {/* ── CTA ── */}
       <section className={isDarkMode ? 'bg-gray-800 py-20' : 'bg-brand-navy py-20'}>
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="font-sora font-bold text-4xl text-white mb-4">
@@ -291,7 +281,6 @@ export default function Services() {
   );
 }
 
-/* ── FAQ Item Component ── */
 function FaqItem({ faq, isDarkMode }) {
   const [open, setOpen] = useState(false);
 

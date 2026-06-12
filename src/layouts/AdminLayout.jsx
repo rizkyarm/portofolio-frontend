@@ -10,32 +10,30 @@ import { useAuth } from '../context/AuthContext';
 import { useDarkMode } from '../context/DarkModeContext';
 import MessagesAdmin from '../pages/admin/MessagesAdmin';
 
-/* ── Nav config ── */
 const navGroups = [
   {
     label: 'Main',
     items: [
-      { path: '/admin',          icon: LayoutDashboard, label: 'Dashboard',  exact: true },
+      { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
     ],
   },
   {
     label: 'Content',
     items: [
-      { path: '/admin/projects', icon: FolderOpen,      label: 'Projects' },
-      { path: '/admin/skills',   icon: Star,            label: 'Skills' },
-      { path: '/admin/services', icon: Wrench,          label: 'Services' },
-      { path: '/admin/messages', icon: MessageSquare,   label: 'Messages' },
+      { path: '/admin/projects', icon: FolderOpen, label: 'Projects' },
+      { path: '/admin/skills', icon: Star, label: 'Skills' },
+      { path: '/admin/services', icon: Wrench, label: 'Services' },
+      { path: '/admin/messages', icon: MessageSquare, label: 'Messages' },
     ],
   },
   {
     label: 'Account',
     items: [
-      { path: '/admin/profile',  icon: User,            label: 'Profile' },
+      { path: '/admin/profile', icon: User, label: 'Profile' },
     ],
   },
 ];
 
-/* ── Sidebar NavItem ── */
 function NavItem({ item, unreadCount, collapsed, onClick, isDarkMode }) {
   const { pathname } = useLocation();
   const isActive = item.exact
@@ -47,11 +45,10 @@ function NavItem({ item, unreadCount, collapsed, onClick, isDarkMode }) {
       to={item.path}
       onClick={onClick}
       title={collapsed ? item.label : undefined}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative ${
-        isActive
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative ${isActive
           ? 'bg-green-900 text-white shadow-sm shadow-brand-purple/30'
           : `${isDarkMode ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`
-      }`}
+        }`}
     >
       <item.icon size={17} className="flex-shrink-0" />
       {!collapsed && (
@@ -64,7 +61,6 @@ function NavItem({ item, unreadCount, collapsed, onClick, isDarkMode }) {
           )}
         </>
       )}
-      {/* Tooltip saat collapsed */}
       {collapsed && (
         <div className={`absolute left-full ml-3 px-2.5 py-1.5 ${isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-gray-900 text-white'} text-xs font-medium rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50`}>
           {item.label}
@@ -80,24 +76,21 @@ function NavItem({ item, unreadCount, collapsed, onClick, isDarkMode }) {
   );
 }
 
-/* ── Main Layout ── */
 export default function AdminLayout() {
-  const { user, logout }        = useAuth();
+  const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-  const navigate                = useNavigate();
-  const { pathname }            = useLocation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [unread,     setUnread]   = useState(3);
+  const [unread, setUnread] = useState(3);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef(null);
 
-  /* Tutup mobile menu saat pindah halaman */
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
-  /* Tutup user menu saat klik di luar */
   useEffect(() => {
     function handleClick(e) {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -113,26 +106,21 @@ export default function AdminLayout() {
     navigate('/admin/login');
   };
 
-  /* Current page title */
   const pageTitle = (() => {
-    if (pathname === '/admin')               return 'Dashboard';
-    if (pathname.includes('projects'))       return 'Projects';
-    if (pathname.includes('skills'))         return 'Skills';
-    if (pathname.includes('services'))       return 'Services';
-    if (pathname.includes('messages'))       return 'Messages';
-    if (pathname.includes('profile'))        return 'Profile';
+    if (pathname === '/admin') return 'Dashboard';
+    if (pathname.includes('projects')) return 'Projects';
+    if (pathname.includes('skills')) return 'Skills';
+    if (pathname.includes('services')) return 'Services';
+    if (pathname.includes('messages')) return 'Messages';
+    if (pathname.includes('profile')) return 'Profile';
     return 'Admin';
   })();
 
   const sidebarW = collapsed ? 'w-16' : 'w-56';
 
   return (
-    // PERBAIKAN: Mengunci tinggi layar dan menyembunyikan overflow pada root
     <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex">
 
-      {/* ══ SIDEBAR ══ */}
-
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -146,7 +134,6 @@ export default function AdminLayout() {
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:z-auto`}
       >
-        {/* Logo */}
         <div className={`flex items-center h-16 px-4 border-b ${isDarkMode ? 'border-gray-800' : 'border-white/5'} flex-shrink-0 ${collapsed ? 'justify-center' : 'justify-between'}`}>
           {!collapsed && (
             <Link to="/" className="font-sora font-bold text-base">
@@ -159,7 +146,6 @@ export default function AdminLayout() {
               My
             </Link>
           )}
-          {/* Collapse toggle — desktop only */}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className={`hidden lg:flex w-7 h-7 rounded-lg ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white/5 hover:bg-white/10'} items-center justify-center ${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-slate-400 hover:text-white'} transition-colors flex-shrink-0`}
@@ -169,7 +155,6 @@ export default function AdminLayout() {
               className={`transition-transform duration-300 ${collapsed ? '' : 'rotate-180'}`}
             />
           </button>
-          {/* Close — mobile */}
           <button
             onClick={() => setMobileOpen(false)}
             className={`lg:hidden w-7 h-7 flex items-center justify-center ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}
@@ -178,7 +163,6 @@ export default function AdminLayout() {
           </button>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 flex flex-col gap-5">
           {navGroups.map((group) => (
             <div key={group.label}>
@@ -203,8 +187,6 @@ export default function AdminLayout() {
           ))}
         </nav>
 
-        {/* Bottom — user info + logout */}
-        {/* mt-auto memastikan ini selalu didorong ke dasar sidebar */}
         <div className={`mt-auto border-t ${isDarkMode ? 'border-gray-800' : 'border-white/5'} p-2 flex-shrink-0`}>
           {!collapsed ? (
             <div ref={userMenuRef} className="relative">
@@ -229,7 +211,6 @@ export default function AdminLayout() {
                 />
               </button>
 
-              {/* User dropdown */}
               {showUserMenu && (
                 <div className={`absolute bottom-full left-0 right-0 mb-1 ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-slate-800 border-white/10'} rounded-xl border overflow-hidden shadow-xl`}>
                   <Link
@@ -279,14 +260,10 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* ══ MAIN AREA ══ */}
-      {/* PERBAIKAN: Memastikan wrapper kanan tinggi penuh dan tidak overlap */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
-        {/* ── TOPBAR ── */}
         <header className={`h-16 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} border-b flex items-center px-4 md:px-6 gap-4 flex-shrink-0 z-30`}>
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(true)}
             className={`lg:hidden w-9 h-9 flex items-center justify-center rounded-xl ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-400 hover:bg-gray-50'} transition-colors`}
@@ -294,17 +271,14 @@ export default function AdminLayout() {
             <Menu size={20} />
           </button>
 
-          {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm">
             <span className={`hidden sm:inline ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Admin</span>
             <span className={`hidden sm:inline ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>/</span>
             <span className={`font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{pageTitle}</span>
           </div>
 
-          {/* Right side */}
           <div className="ml-auto flex items-center gap-2">
 
-            {/* View site */}
             <a
               href="/"
               target="_blank"
@@ -314,7 +288,6 @@ export default function AdminLayout() {
               View Site
             </a>
 
-            {/* Notifications */}
             <button className={`relative w-9 h-9 flex items-center justify-center rounded-xl ${isDarkMode ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-200' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'} transition-colors`}>
               <Bell size={17} />
               {unread > 0 && (
@@ -322,15 +295,12 @@ export default function AdminLayout() {
               )}
             </button>
 
-            {/* Avatar */}
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-purple to-brand-light flex items-center justify-center font-sora font-bold text-white text-xs cursor-pointer">
               {user?.name?.charAt(0).toUpperCase() || 'A'}
             </div>
           </div>
         </header>
 
-        {/* ── PAGE CONTENT ── */}
-        {/* PERBAIKAN: Menerapkan overflow-y-auto secara spesifik pada tag <main> */}
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>

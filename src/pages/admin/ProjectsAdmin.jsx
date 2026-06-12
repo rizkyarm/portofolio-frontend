@@ -9,7 +9,6 @@ import {
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-/* ── Config ── */
 const CATEGORIES = [
   { key: 'all',     label: 'Semua' },
   { key: 'website', label: 'Website' },
@@ -38,7 +37,6 @@ const statusStyle = {
 
 const PER_PAGE = 8;
 
-/* ── Toast ── */
 function Toast({ toast, onClose, isDarkMode }) {
   useEffect(() => {
     if (!toast) return;
@@ -61,7 +59,6 @@ function Toast({ toast, onClose, isDarkMode }) {
   );
 }
 
-/* ── Delete Confirm Modal ── */
 function DeleteModal({ project, onConfirm, onCancel, loading, isDarkMode }) {
   if (!project) return null;
   return (
@@ -108,7 +105,6 @@ function DeleteModal({ project, onConfirm, onCancel, loading, isDarkMode }) {
   );
 }
 
-/* ── Row Actions Dropdown ── */
 function RowActions({ project, onDelete, isDarkMode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -175,7 +171,6 @@ function RowActions({ project, onDelete, isDarkMode }) {
   );
 }
 
-/* ── Skeleton Row ── */
 function SkeletonRow({ isDarkMode }) {
   return (
     <tr className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-50'}`}>
@@ -188,7 +183,6 @@ function SkeletonRow({ isDarkMode }) {
   );
 }
 
-/* ── Main Component ── */
 export default function ProjectsAdmin() {
   const { isDarkMode } = useDarkMode();
   const [projects,  setProjects]  = useState([]);
@@ -203,7 +197,7 @@ export default function ProjectsAdmin() {
   const [delLoading,setDelLoading]= useState(false);
   const [toast,     setToast]     = useState(null);
 
-  /* Fetch projects */
+  
   const fetchProjects = async () => {
     setLoading(true);
     try {
@@ -221,7 +215,7 @@ export default function ProjectsAdmin() {
 
   useEffect(() => { setPage(1); }, [search, catFilter, stsFilter]);
 
-  /* Filter + sort */
+  
   const filtered = projects
     .filter((p) => {
       const matchSearch = !search ||
@@ -241,17 +235,17 @@ export default function ProjectsAdmin() {
       return 0;
     });
 
-  /* Pagination */
+  
   const totalPages  = Math.ceil(filtered.length / PER_PAGE);
   const paginated   = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  /* Sort toggle */
+  
   const toggleSort = (col) => {
     if (sortBy === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortBy(col); setSortDir('asc'); }
   };
 
-  /* Delete */
+  
   const handleDelete = async () => {
     if (!delTarget) return;
     setDelLoading(true);
@@ -267,7 +261,7 @@ export default function ProjectsAdmin() {
     }
   };
 
-  /* Toggle status live/draft */
+  
   const toggleStatus = async (project) => {
     const newStatus = project.status === 'live' ? 'draft' : 'live';
     try {
@@ -291,7 +285,6 @@ export default function ProjectsAdmin() {
   return (
     <div className={`p-6 md:p-8 max-w-full mx-auto h-full ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
 
-      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className={`font-sora font-bold text-2xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Projects</h1>
@@ -308,10 +301,9 @@ export default function ProjectsAdmin() {
         </Link>
       </div>
 
-      {/* ── Filters ── */}
       <div className={`rounded-2xl border p-4 mb-5 flex flex-col md:flex-row gap-3 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
 
-        {/* Search */}
+        
         <div className="relative flex-1">
           <Search size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
           <input
@@ -331,7 +323,7 @@ export default function ProjectsAdmin() {
           )}
         </div>
 
-        {/* Category filter */}
+        
         <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
           {CATEGORIES.map((cat) => (
             <button
@@ -348,7 +340,7 @@ export default function ProjectsAdmin() {
           ))}
         </div>
 
-        {/* Status filter */}
+        
         <select
           value={stsFilter}
           onChange={(e) => setStsFilter(e.target.value)}
@@ -360,10 +352,9 @@ export default function ProjectsAdmin() {
         </select>
       </div>
 
-      {/* ── Table ── */}
       <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
 
-        {/* Active filters summary */}
+        
         {(search || catFilter !== 'all' || stsFilter !== 'all') && (
           <div className={`px-5 py-3 border-b flex items-center gap-2 text-xs ${isDarkMode ? 'bg-gray-700/50 border-gray-700 text-brand-purple' : 'bg-brand-pale/30 border-brand-pale text-brand-purple'}`}>
             <Filter size={12} className="text-brand-purple" />
@@ -463,10 +454,10 @@ export default function ProjectsAdmin() {
                     key={project.id}
                     className={`border-b last:border-0 transition-colors ${isDarkMode ? 'border-gray-700 hover:bg-gray-700/30' : 'border-gray-50 hover:bg-gray-50/40'}`}
                   >
-                    {/* Title */}
+                    
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        {/* Thumbnail mini */}
+                        
                         <div className={`w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center text-white text-xs font-bold bg-gradient-to-br ${
                           project.category === 'website' ? 'from-indigo-400 to-purple-500' :
                           project.category === 'android' ? 'from-fuchsia-400 to-purple-500' :
@@ -486,14 +477,14 @@ export default function ProjectsAdmin() {
                       </div>
                     </td>
 
-                    {/* Category */}
+                    
                     <td className="px-3 py-4 hidden md:table-cell">
                       <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${isDarkMode && project.category in categoryStyle ? 'opacity-75' : ''} ${categoryStyle[project.category] || (isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600')}`}>
                         {project.category}
                       </span>
                     </td>
 
-                    {/* Tags */}
+                    
                     <td className="px-3 py-4 hidden lg:table-cell">
                       <div className="flex gap-1 flex-wrap max-w-[180px]">
                         {(project.tags || []).slice(0, 2).map(tag => (
@@ -509,7 +500,7 @@ export default function ProjectsAdmin() {
                       </div>
                     </td>
 
-                    {/* Status toggle */}
+                    
                     <td className="px-3 py-4">
                       <button
                         onClick={() => toggleStatus(project)}
@@ -520,14 +511,14 @@ export default function ProjectsAdmin() {
                       </button>
                     </td>
 
-                    {/* Date */}
+                    
                     <td className="px-3 py-4 hidden sm:table-cell">
                       <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                         {project.created_at || '—'}
                       </span>
                     </td>
 
-                    {/* Actions */}
+                    
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1">
                         <Link
@@ -558,7 +549,6 @@ export default function ProjectsAdmin() {
           </table>
         </div>
 
-        {/* ── Pagination ── */}
         {!loading && totalPages > 1 && (
           <div className={`flex items-center justify-between px-5 py-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
             <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -606,7 +596,6 @@ export default function ProjectsAdmin() {
         )}
       </div>
 
-      {/* ── Modals & Toast ── */}
       <DeleteModal
         project={delTarget}
         onConfirm={handleDelete}
@@ -623,5 +612,4 @@ export default function ProjectsAdmin() {
   );
 }
 
-/* ── Dummy data ── */
 const dummyProjects = [];

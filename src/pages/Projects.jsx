@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkModeContext';
-import api from '../services/api';
+import SEO from '../components/shared/SEO';
+import useApiCache from '../hooks/useApiCache';
 
 const categoryColors = {
   website: 'from-indigo-500 to-green-600',
@@ -19,18 +20,9 @@ const categoryLabel = {
 
 export default function Projects() {
   const { isDarkMode } = useDarkMode();
-  const [projects, setProjects] = useState([]);
+  const { data: projects = [], loading, fromCache } = useApiCache('/projects', { initialValue: [] });
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    api.get('/projects')
-      .then((res) => setProjects(res.data.data || res.data))
-      .catch(() => setProjects(dummyProjects))
-      .finally(() => setLoading(false));
-  }, []);
 
   const filtered = projects.filter((p) => {
     const matchCategory = activeFilter === 'all' || p.category === activeFilter;
@@ -43,8 +35,12 @@ export default function Projects() {
     <div className={`min-h-screen ${
       isDarkMode ? 'bg-gray-900' : 'bg-white'
     }`}>
+      <SEO
+        title="Projects"
+        description="Explore my portfolio of web development, Android apps, video production, and design projects."
+        path="/projects"
+      />
 
-      {/* ── HERO SECTION ── */}
       <section className={`py-20 ${
         isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-green-50 via-white to-blue-50'
       }`}>
@@ -65,7 +61,6 @@ export default function Projects() {
         </div>
       </section>
 
-      {/* ── PROJECTS GRID SECTION ── */}
       <section className={`max-w-6xl mx-auto px-6 py-16 ${
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       }`}>
@@ -74,7 +69,7 @@ export default function Projects() {
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>All Projects</h2>
 
-          {/* Search bar */}
+          
           <div className="mb-8">
             <input
               type="text"
@@ -89,7 +84,7 @@ export default function Projects() {
             />
           </div>
 
-          {/* Filter tabs */}
+          
           <div className="flex flex-wrap gap-2">
             {[
               { key: 'all', label: 'All' },
@@ -115,7 +110,7 @@ export default function Projects() {
           </div>
         </div>
 
-        {/* Results count */}
+        
         <div className={`mb-6 text-sm ${
           isDarkMode ? 'text-gray-400' : 'text-gray-600'
         }`}>
@@ -124,7 +119,7 @@ export default function Projects() {
           }`}>{filtered.length}</span> project{filtered.length !== 1 ? 's' : ''}
         </div>
 
-        {/* Projects Grid */}
+        
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -154,7 +149,6 @@ export default function Projects() {
   );
 }
 
-/* ── Project Card Component ── */
 function ProjectCard({ project, isDarkMode }) {
   return (
     <Link to={`/projects/${project.slug}`}>
@@ -162,7 +156,7 @@ function ProjectCard({ project, isDarkMode }) {
         isDarkMode ? 'bg-gray-800 border-gray-700 hover:border-green-500' : 'bg-white border-gray-100'
       }`}>
 
-        {/* Thumbnail */}
+        
         <div className={`h-48 bg-gradient-to-br ${categoryColors[project.category] || 'from-gray-400 to-gray-600'} flex items-center justify-center relative overflow-hidden`}>
           {project.thumbnail ? (
             <img
@@ -184,10 +178,10 @@ function ProjectCard({ project, isDarkMode }) {
           )}
         </div>
 
-        {/* Body */}
+        
         <div className="p-6 flex flex-col flex-grow">
           
-          {/* Category badge */}
+          
           <div className="inline-flex items-center mb-3">
             <span className={`text-xs font-bold px-3 py-1 rounded-full ${
               project.category === 'website' ? isDarkMode ? 'bg-indigo-900/40 text-indigo-300' : 'bg-green-100 text-green-700' :
@@ -199,21 +193,21 @@ function ProjectCard({ project, isDarkMode }) {
             </span>
           </div>
 
-          {/* Title */}
+          
           <h3 className={`font-sora font-bold text-lg mb-2 line-clamp-2 group-hover:text-green-500 transition-colors ${
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>
             {project.title}
           </h3>
 
-          {/* Description */}
+          
           <p className={`text-sm leading-relaxed mb-4 flex-grow line-clamp-3 ${
             isDarkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>
             {project.short_description || project.description?.substring(0, 100) + '...'}
           </p>
 
-          {/* Tags */}
+          
           <div className="flex flex-wrap gap-1.5 mb-4">
             {(project.tags || []).slice(0, 3).map((tag) => (
               <span
@@ -234,7 +228,7 @@ function ProjectCard({ project, isDarkMode }) {
             )}
           </div>
 
-          {/* Footer — view link */}
+          
           <div className={`flex items-center justify-between pt-4 border-t transition-colors ${
             isDarkMode ? 'border-gray-700 group-hover:border-green-500' : 'border-gray-100 group-hover:border-green-500'
           }`}>
@@ -249,6 +243,5 @@ function ProjectCard({ project, isDarkMode }) {
   );
 }
 
-/* ── Dummy Projects Data ── */
 const dummyProjects = [
 ];

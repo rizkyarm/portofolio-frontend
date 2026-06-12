@@ -4,8 +4,6 @@ import App      from './App';
 import { DarkModeProvider } from './context/DarkModeContext';
 import './index.css';
 
-console.log('Mounting React app...');
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <DarkModeProvider>

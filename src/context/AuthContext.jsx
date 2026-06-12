@@ -8,34 +8,32 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log('AuthProvider mounted');
-    // Tidak check token di initial load untuk menghindari blocking
     const token = localStorage.getItem('admin_token');
-    if (token) {
-      setLoading(true);
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
+    if (!token) return;
 
-      api.get('/admin/me', { signal: controller.signal })
-        .then(res => {
-          console.log('Auth check success:', res.data.user);
-          setUser(res.data.user);
-        })
-        .catch(err => {
-          console.log('Auth check failed:', err.message);
-          localStorage.removeItem('admin_token');
-          setUser(null);
-        })
-        .finally(() => {
-          clearTimeout(timeout);
-          setLoading(false);
-        });
+    setLoading(true);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
 
-      return () => {
+    api.get('/auth/me', { signal: controller.signal })
+      .then(res => {
+        setUser(res.data.user);
+      })
+      .catch(err => {
+        if (err.code === 'ERR_CANCELED' || err.name === 'AbortError' || err.name === 'CanceledError') {
+          return;
+        }
+        setUser(null);
+      })
+      .finally(() => {
         clearTimeout(timeout);
-        controller.abort();
-      };
-    }
+        setLoading(false);
+      });
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, []);
 
   const login = async (email, password) => {
@@ -46,7 +44,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await api.post('/admin/logout').catch(() => {});
+    await api.post('/auth/logout').catch(() => {});
     localStorage.removeItem('admin_token');
     setUser(null);
   };

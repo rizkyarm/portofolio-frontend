@@ -7,7 +7,6 @@ import {
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-/* ── Category ── */
 const CATEGORIES = [
   { key: 'frontend', label: 'Frontend', color: '#6c5ce7', bg: 'bg-purple-100 text-purple-700' },
   { key: 'mobile',   label: 'Mobile',   color: '#e84393', bg: 'bg-pink-100 text-pink-700' },
@@ -18,7 +17,6 @@ const CATEGORIES = [
 const getCatConfig = (key) =>
   CATEGORIES.find(c => c.key === key) || { label: key, color: '#999', bg: 'bg-gray-100 text-gray-600' };
 
-/* ── Toast ── */
 function Toast({ toast, onClose, isDarkMode }) {
   useEffect(() => {
     if (!toast) return;
@@ -39,7 +37,6 @@ function Toast({ toast, onClose, isDarkMode }) {
   );
 }
 
-/* ── Delete Modal ── */
 function DeleteModal({ skill, onConfirm, onCancel, loading, isDarkMode }) {
   if (!skill) return null;
   return (
@@ -76,7 +73,6 @@ function DeleteModal({ skill, onConfirm, onCancel, loading, isDarkMode }) {
   );
 }
 
-/* ── Skill Form Modal ── */
 function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
   const [form, setForm] = useState({
     name:       skill?.name       ?? '',
@@ -108,7 +104,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden`}>
 
-        {/* Header */}
+        
         <div className={`flex items-center justify-between px-6 py-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
           <div>
             <h3 className={`font-sora font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -128,7 +124,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
 
         <div className="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
 
-          {/* Name */}
+          
           <div>
             <label className={`block text-sm font-semibold mb-1.5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
               Nama Skill <span className="text-red-400">*</span>
@@ -142,7 +138,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
             />
           </div>
 
-          {/* Category */}
+          
           <div>
             <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
               Kategori
@@ -165,7 +161,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
             </div>
           </div>
 
-          {/* LEVEL / PERSENTASE */}
+          
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className={`text-sm font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
@@ -188,7 +184,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
               </div>
             </div>
 
-            {/* Slider */}
+            
             <div className="relative mb-2">
               <input
                 type="range"
@@ -204,14 +200,14 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
               />
             </div>
 
-            {/* Tick marks */}
+            
             <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
               {[0, 25, 50, 75, 100].map(v => (
                 <span key={v}>{v}%</span>
               ))}
             </div>
 
-            {/* Quick select */}
+            
             <div className="flex gap-2 mt-3 flex-wrap">
               {[
                 { label: 'Newbie',       val: 20 },
@@ -235,7 +231,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
               ))}
             </div>
 
-            {/* Preview progress bar */}
+            
             <div className={`mt-3 rounded-xl p-3 border ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-100'}`}>
               <div className={`flex items-center justify-between text-xs mb-2`}>
                 <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -254,7 +250,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
             </div>
           </div>
 
-          {/* Color + Icon */}
+          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={`block text-sm font-semibold mb-1.5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
@@ -290,7 +286,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
             </div>
           </div>
 
-          {/* Order + Visibility */}
+          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={`block text-sm font-semibold mb-1.5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
@@ -326,7 +322,7 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
           </div>
         </div>
 
-        {/* Footer */}
+        
         <div className={`flex gap-3 px-6 py-4 border-t ${isDarkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-100 bg-gray-50'}`}>
           <button
             onClick={onClose}
@@ -350,7 +346,6 @@ function SkillFormModal({ skill, onSave, onClose, saving, isDarkMode }) {
   );
 }
 
-/* ── Skill Card ── */
 function SkillCard({ skill, onEdit, onDelete, onToggleVisible, isDarkMode }) {
   const cat      = getCatConfig(skill.category);
   const levelColor = skill.level >= 80
@@ -360,10 +355,10 @@ function SkillCard({ skill, onEdit, onDelete, onToggleVisible, isDarkMode }) {
   return (
     <div className={`rounded-2xl border p-5 hover:shadow-md transition-all group ${!skill.is_visible ? 'opacity-60' : ''} ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:shadow-xl hover:shadow-gray-900/20' : 'bg-white border-gray-100'}`}>
 
-      {/* Top row */}
+      
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          {/* Color dot / icon */}
+          
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
             style={{ background: skill.color || cat.color }}
@@ -382,7 +377,7 @@ function SkillCard({ skill, onEdit, onDelete, onToggleVisible, isDarkMode }) {
           </div>
         </div>
 
-        {/* Actions */}
+        
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onToggleVisible(skill)}
@@ -410,7 +405,7 @@ function SkillCard({ skill, onEdit, onDelete, onToggleVisible, isDarkMode }) {
         </div>
       </div>
 
-      {/* Level bar */}
+      
       <div>
         <div className="flex items-center justify-between mb-1.5">
           <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Level Keahlian</span>
@@ -441,7 +436,7 @@ function SkillCard({ skill, onEdit, onDelete, onToggleVisible, isDarkMode }) {
         </div>
       </div>
 
-      {/* Hidden badge */}
+      
       {!skill.is_visible && (
         <div className={`mt-3 flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg ${isDarkMode ? 'text-gray-500 bg-gray-700' : 'text-gray-400 bg-gray-50'}`}>
           <EyeOff size={11} />
@@ -452,7 +447,6 @@ function SkillCard({ skill, onEdit, onDelete, onToggleVisible, isDarkMode }) {
   );
 }
 
-/* ── Main Component ── */
 export default function SkillsAdmin() {
   const { isDarkMode } = useDarkMode();
   const [skills,     setSkills]     = useState([]);
@@ -487,7 +481,7 @@ export default function SkillsAdmin() {
 
   useEffect(() => { fetchSkills(); }, []);
 
-  /* Filter + sort */
+  
   const filtered = skills
     .filter(s => catFilter === 'all' || s.category === catFilter)
     .sort((a, b) => {
@@ -502,7 +496,7 @@ export default function SkillsAdmin() {
     return acc;
   }, {});
 
-  /* Save (create / update) via refetch */
+  
   const handleSave = async (formData) => {
     if (!formData.name.trim()) {
       setToast({ type: 'error', message: 'Nama skill wajib diisi!' });
@@ -575,7 +569,7 @@ export default function SkillsAdmin() {
     }
   };
 
-  /* Stats */
+  
   const totalVisible = skills.filter(s => s.is_visible).length;
   const avgLevel     = skills.length
     ? Math.round(skills.reduce((sum, s) => sum + (s.level ?? 0), 0) / skills.length)
@@ -585,7 +579,6 @@ export default function SkillsAdmin() {
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="p-6 md:p-8 max-w-7xl mx-auto">
 
-        {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className={`font-sora font-bold text-2xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Skills</h1>
@@ -602,7 +595,6 @@ export default function SkillsAdmin() {
           </button>
         </div>
 
-        {/* ── Stats ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {CATEGORIES.map(cat => {
             const items   = skills.filter(s => s.category === cat.key);
@@ -632,7 +624,6 @@ export default function SkillsAdmin() {
           })}
         </div>
 
-      {/* ── Filters ── */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className={`flex gap-1.5 p-1 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
           <button
@@ -663,7 +654,7 @@ export default function SkillsAdmin() {
           })}
         </div>
 
-        {/* Sort */}
+        
         <div className="ml-auto flex items-center gap-2">
           <ArrowUpDown size={13} className={isDarkMode ? 'text-gray-500' : 'text-gray-400'} />
           <select
@@ -678,7 +669,6 @@ export default function SkillsAdmin() {
         </div>
       </div>
 
-      {/* ── Content ── */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -703,7 +693,7 @@ export default function SkillsAdmin() {
           </button>
         </div>
       ) : catFilter === 'all' ? (
-        /* Grouped view */
+        
         <div className="flex flex-col gap-8">
           {Object.entries(grouped).map(([catKey, items]) => {
             if (items.length === 0) return null;
@@ -742,7 +732,7 @@ export default function SkillsAdmin() {
           })}
         </div>
       ) : (
-        /* Filtered view */
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(skill => (
             <SkillCard
@@ -757,7 +747,6 @@ export default function SkillsAdmin() {
         </div>
       )}
 
-      {/* ── Modals ── */}
       {showModal && (
         <SkillFormModal
           skill={editTarget}

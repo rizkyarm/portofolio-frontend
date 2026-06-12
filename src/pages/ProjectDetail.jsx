@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ExternalLink, Play,
@@ -7,42 +7,10 @@ import {
 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { useDarkMode } from '../context/DarkModeContext';
-import api from '../services/api';
+import SEO from '../components/shared/SEO';
+import Reveal from '../components/animations/Reveal';
+import useApiCache from '../hooks/useApiCache';
 
-/* ── Intersection Observer hook ── */
-function useReveal() {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, visible];
-}
-
-function Reveal({ children, className = '', delay = 0 }) {
-  const [ref, visible] = useReveal();
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 0.6s ease, transform 0.6s ease`,
-        transitionDelay: `${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-/* ── Config ── */
 const categoryConfig = {
   website: {
     label: 'Website Project',
@@ -84,11 +52,9 @@ const tabs = [
   { key: 'stack',     label: 'Tech Stack' },
 ];
 
-/* ── Dummy fallback data ── */
 const dummyProject = {
 };
 
-/* ── Skeleton Loader ── */
 function SkeletonLoader({ isDarkMode }) {
   return (
     <div className="animate-pulse">
@@ -117,41 +83,23 @@ function SkeletonLoader({ isDarkMode }) {
   );
 }
 
-/* ── Main Component ── */
 export default function ProjectDetail() {
   const { isDarkMode } = useDarkMode();
   const { slug }          = useParams();
   const navigate          = useNavigate();
-  const [project, setProject]   = useState(null);
-  const [otherProjects, setOtherProjects] = useState([]);
-  const [loading, setLoading]   = useState(true);
+  const { data: project, loading: detailLoading } = useApiCache(`/projects/${slug}`, {
+    transform: (res) => res.data.data || res.data,
+    initialValue: null,
+  });
+  const { data: allProjects = [], loading: listLoading } = useApiCache('/projects', { initialValue: [] });
   const [activeTab, setActiveTab] = useState('overview');
   const [lightbox, setLightbox] = useState(null);
   const tabRef = useRef(null);
 
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      api.get(`/projects/${slug}`),
-      api.get('/projects')
-    ])
-      .then(([detailRes, listRes]) => {
-        const currentProject = detailRes.data.data || detailRes.data;
-        setProject(currentProject);
-
-        const allProjects = listRes.data.data || listRes.data || [];
-        const filteredOthers = allProjects
-          .filter(p => p.id !== currentProject.id)
-          .slice(0, 3);
-        
-        setOtherProjects(filteredOthers);
-      })
-      .catch(() => {
-        setProject(dummyProject);
-        setOtherProjects([]); 
-      })
-      .finally(() => setLoading(false));
-  }, [slug]);
+  const loading = detailLoading || listLoading;
+  const otherProjects = project
+    ? allProjects.filter(p => p.id !== project.id).slice(0, 3)
+    : [];
 
   const scrollToTab = () => {
     tabRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -192,11 +140,17 @@ export default function ProjectDetail() {
 
   return (
     <div className="overflow-x-hidden">
+      <SEO
+        title={project.title}
+        description={project.short_description || project.description?.substring(0, 160)}
+        path={`/projects/${project.slug}`}
+        type="article"
+      />
 
-      {/* ══ HERO ══ */}
+      
       <section className={`relative bg-gradient-to-br ${config.gradient} overflow-hidden`}>
 
-        {/* Background decoration */}
+        
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/10 blur-3xl" />
           <div className="absolute bottom-0 -left-10 w-48 h-48 rounded-full bg-black/10 blur-2xl" />
@@ -209,7 +163,7 @@ export default function ProjectDetail() {
           />
         </div>
 
-        {/* Sticky top bar */}
+        
         <div className="sticky top-16 z-40 bg-black/20 backdrop-blur-md border-b border-white/10">
           <div className="max-w-6xl mx-auto px-6 h-12 flex items-center gap-4">
             <button
@@ -262,13 +216,13 @@ export default function ProjectDetail() {
           </div>
         </div>
 
-        {/* Hero content */}
+        
         <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
-            {/* Left */}
+            
             <div>
-              {/* Breadcrumb */}
+              
               <div
                 className="flex items-center gap-1.5 text-white/60 text-xs mb-5"
                 style={{ animation: 'fadeUp 0.5s ease forwards' }}
@@ -280,7 +234,7 @@ export default function ProjectDetail() {
                 <span className="text-white/90">{project.title}</span>
               </div>
 
-              {/* Category badge */}
+              
               <div
                 className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-5 border border-white/20"
                 style={{ animation: 'fadeUp 0.5s ease 0.05s forwards', opacity: 0 }}
@@ -307,7 +261,7 @@ export default function ProjectDetail() {
                 {project.short_description || project.description?.substring(0, 120) + '...'}
               </p>
 
-              {/* Tags */}
+              
               <div
                 className="flex flex-wrap gap-2 mb-7"
                 style={{ animation: 'fadeUp 0.5s ease 0.2s forwards', opacity: 0 }}
@@ -322,7 +276,7 @@ export default function ProjectDetail() {
                 ))}
               </div>
 
-              {/* Action buttons */}
+              
               <div
                 className="flex flex-wrap gap-3"
                 style={{ animation: 'fadeUp 0.5s ease 0.25s forwards', opacity: 0 }}
@@ -352,7 +306,7 @@ export default function ProjectDetail() {
               </div>
             </div>
 
-            {/* Right — thumbnail / mockup */}
+            
             <div
               className="flex justify-center"
               style={{ animation: 'fadeUp 0.5s ease 0.2s forwards', opacity: 0 }}
@@ -367,7 +321,7 @@ export default function ProjectDetail() {
                 </div>
               ) : (
                 <div className="relative w-full max-w-sm">
-                  {/* Main screen */}
+                  
                   <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-3xl p-6 shadow-2xl">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-3 h-3 rounded-full bg-white/40" />
@@ -389,7 +343,7 @@ export default function ProjectDetail() {
                       <div className="h-3 bg-white/10 rounded w-3/4" />
                     </div>
                   </div>
-                  {/* Floating badge */}
+                  
                   <div className="absolute -bottom-3 -right-3 bg-white rounded-2xl px-4 py-2 shadow-xl">
                     <div className="text-xs font-bold text-gray-900">
                       {project.status === 'live' ? '🟢 Live' : '🟡 Draft'}
@@ -410,19 +364,18 @@ export default function ProjectDetail() {
         `}</style>
       </section>
 
-      {/* ══ TAB CONTENT ══ */}
+      
       <div ref={tabRef} className={`max-w-auto mx-auto px-6 py-16 ${
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       }`}>
 
-        {/* ── OVERVIEW TAB ── */}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-            {/* Main content */}
+            
             <div className="lg:col-span-2 flex flex-col gap-10">
 
-              {/* Description */}
+              
               <Reveal>
                 <div>
                   <div className="text-xs font-semibold text-green-600 uppercase tracking-widest mb-3">
@@ -440,7 +393,7 @@ export default function ProjectDetail() {
                 </div>
               </Reveal>
 
-              {/* Image gallery */}
+              
               {images.length > 0 && (
                 <Reveal>
                   <div>
@@ -468,7 +421,7 @@ export default function ProjectDetail() {
                 </Reveal>
               )}
 
-              {/* Quick features preview */}
+              
               {features.length > 0 && (
                 <Reveal>
                   <div className={`rounded-3xl p-6 border ${
@@ -508,10 +461,10 @@ export default function ProjectDetail() {
               )}
             </div>
 
-            {/* Sidebar */}
+            
             <div className="flex flex-col gap-5">
 
-              {/* Project info card */}
+              
               <Reveal delay={100}>
                 <div className={`rounded-3xl p-5 shadow-sm border ${
                   isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
@@ -570,7 +523,7 @@ export default function ProjectDetail() {
                 </div>
               </Reveal>
 
-              {/* Tech stack preview */}
+              
               {techStack.length > 0 && (
                 <Reveal delay={150}>
                   <div className={`rounded-3xl p-5 shadow-sm border ${
@@ -619,7 +572,7 @@ export default function ProjectDetail() {
                 </Reveal>
               )}
 
-              {/* CTA card */}
+              
               <Reveal delay={200}>
                 <div className={isDarkMode ? 'bg-gray-800 rounded-3xl p-5' : 'bg-brand-navy rounded-3xl p-5'}>
                   <div className="text-white font-sora font-bold mb-2">
@@ -643,7 +596,6 @@ export default function ProjectDetail() {
           </div>
         )}
 
-        {/* ── FEATURES TAB ── */}
         {activeTab === 'features' && (
           <div>
             <Reveal className="mb-10 text-center">
@@ -691,7 +643,6 @@ export default function ProjectDetail() {
           </div>
         )}
 
-        {/* ── STACK TAB ── */}
         {activeTab === 'stack' && (
           <div>
             <Reveal className="mb-10 text-center">
@@ -746,7 +697,7 @@ export default function ProjectDetail() {
               })}
             </div>
 
-            {/* Architecture diagram placeholder */}
+            
             <Reveal>
               <div className={`rounded-3xl border p-8 text-center ${
                 isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-100'
@@ -781,7 +732,7 @@ export default function ProjectDetail() {
         )}
       </div>
 
-      {/* ══ OTHER PROJECTS ══ */}
+      
       <section className={`py-16 ${
         isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
       }`}>
@@ -831,7 +782,7 @@ export default function ProjectDetail() {
                       </div>
                     )}
                     
-                    {/* Badge Kategori */}
+                    
                     {p.category && (
                       <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-green-500 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
                         {p.category}
@@ -839,7 +790,7 @@ export default function ProjectDetail() {
                     )}
                   </div>
 
-                  {/* Bagian Konten / Teks */}
+                  
                   <div className="p-4">
                     <h3 className={`font-sora font-bold text-sm mb-1 group-hover:text-green-500 transition-colors truncate ${
                       isDarkMode ? 'text-white' : 'text-gray-900'
@@ -856,7 +807,7 @@ export default function ProjectDetail() {
               </Reveal>
             ))}
 
-            {/* Fallback  */}
+            
             {otherProjects.length === 0 && (
               <div className={`col-span-1 sm:col-span-3 text-center py-10 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                 Belum ada project lain yang dipublikasikan.
@@ -866,7 +817,7 @@ export default function ProjectDetail() {
         </div>
       </section>
 
-      {/* ══ CTA ══ */}
+      
       <section className={`max-w-auto mx-auto px-6 py-20 text-center ${
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       }`}>
@@ -905,7 +856,7 @@ export default function ProjectDetail() {
         </Reveal>
       </section>
 
-      {/* ══ LIGHTBOX ══ */}
+      
       {lightbox && (
         <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"

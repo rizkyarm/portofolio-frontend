@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 
-/* ── Config ── */
 const CATEGORIES = [
   { key: 'website', label: 'Website',     icon: Globe,       color: 'border-indigo-300 bg-indigo-50 text-indigo-700' },
   { key: 'android', label: 'Android App', icon: Smartphone,  color: 'border-fuchsia-300 bg-fuchsia-50 text-fuchsia-700' },
@@ -21,13 +20,12 @@ const STATUSES = [
   { key: 'live',  label: 'Live',   desc: 'Tampil di website publik' },
 ];
 
-/* ── Reusable Components ── */
 function FormSection({ title, desc, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100">
-        <h2 className="font-sora font-bold text-sm text-gray-900">{title}</h2>
-        {desc && <p className="text-xs text-gray-400 mt-0.5">{desc}</p>}
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+        <h2 className="font-sora font-bold text-sm text-gray-900 dark:text-white">{title}</h2>
+        {desc && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{desc}</p>}
       </div>
       <div className="p-6">{children}</div>
     </div>
@@ -38,11 +36,11 @@ function FormField({ label, required, error, hint, children }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <label className="text-sm font-semibold text-gray-700">
+        <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">
           {label}
           {required && <span className="text-red-400 ml-0.5">*</span>}
         </label>
-        {hint && <span className="text-xs text-gray-400">{hint}</span>}
+        {hint && <span className="text-xs text-gray-400 dark:text-gray-500">{hint}</span>}
       </div>
       {children}
       {error && (
@@ -56,14 +54,13 @@ function FormField({ label, required, error, hint, children }) {
 }
 
 const inputClass =
-  'w-full px-4 py-2.5 rounded-xl border text-sm text-gray-800 ' +
-  'placeholder-gray-400 bg-white outline-none transition-all ' +
-  'focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/10';
+  'w-full px-4 py-2.5 rounded-xl border text-sm text-gray-800 dark:text-gray-100 ' +
+  'placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800 outline-none transition-all ' +
+  'focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/10 dark:focus:ring-brand-purple/20';
 
-const inputError = 'border-red-300 ring-2 ring-red-100';
-const inputNormal = 'border-gray-200';
+const inputError = 'border-red-300 ring-2 ring-red-100 dark:ring-red-900/30';
+const inputNormal = 'border-gray-200 dark:border-gray-700';
 
-/* ── Tag Input ── */
 function TagInput({ tags, onChange, placeholder }) {
   const [input, setInput] = useState('');
 
@@ -87,11 +84,11 @@ function TagInput({ tags, onChange, placeholder }) {
   };
 
   return (
-    <div className={`flex flex-wrap gap-2 px-3 py-2.5 rounded-xl border ${inputNormal} focus-within:border-brand-purple focus-within:ring-2 focus-within:ring-brand-purple/10 transition-all bg-white min-h-[44px]`}>
+    <div className={`flex flex-wrap gap-2 px-3 py-2.5 rounded-xl border ${inputNormal} focus-within:border-brand-purple focus-within:ring-2 focus-within:ring-brand-purple/10 dark:focus-within:ring-brand-purple/20 transition-all bg-white dark:bg-gray-800 min-h-[44px]`}>
       {tags.map(tag => (
         <span
           key={tag}
-          className="inline-flex items-center gap-1.5 bg-brand-pale text-brand-purple text-xs font-semibold px-2.5 py-1 rounded-full"
+          className="inline-flex items-center gap-1.5 bg-brand-pale dark:bg-brand-purple/20 text-brand-purple dark:text-brand-light text-xs font-semibold px-2.5 py-1 rounded-full"
         >
           {tag}
           <button
@@ -110,13 +107,12 @@ function TagInput({ tags, onChange, placeholder }) {
         onKeyDown={handleKey}
         onBlur={() => input && addTag(input)}
         placeholder={tags.length === 0 ? placeholder : 'Tambah lagi...'}
-        className="flex-1 min-w-24 text-sm outline-none placeholder-gray-400 bg-transparent"
+        className="flex-1 min-w-24 text-sm outline-none placeholder-gray-400 dark:placeholder-gray-500 bg-transparent dark:text-gray-100"
       />
     </div>
   );
 }
 
-/* ── Dynamic List Input (features / tech stack) ── */
 function DynamicList({ items, onChange, placeholder, fields }) {
   const addItem = () => {
     if (fields) {
@@ -169,7 +165,7 @@ function DynamicList({ items, onChange, placeholder, fields }) {
           <button
             type="button"
             onClick={() => removeItem(i)}
-            className="w-9 h-[42px] flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors flex-shrink-0"
+            className="w-9 h-[42px] flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 hover:border-red-200 dark:hover:border-red-800 transition-colors flex-shrink-0"
           >
             <X size={14} />
           </button>
@@ -178,7 +174,7 @@ function DynamicList({ items, onChange, placeholder, fields }) {
       <button
         type="button"
         onClick={addItem}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-brand-purple hover:text-brand-purple text-sm font-medium transition-all"
+        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-brand-purple hover:text-brand-purple dark:hover:text-brand-light text-sm font-medium transition-all"
       >
         <Plus size={15} />
         Tambah {placeholder || 'Item'}
@@ -187,7 +183,6 @@ function DynamicList({ items, onChange, placeholder, fields }) {
   );
 }
 
-/* ── Image Upload ── */
 function ImageUpload({ value, preview, onChange, label }) {
   const inputRef = useRef(null);
   const [drag, setDrag] = useState(false);
@@ -212,7 +207,7 @@ function ImageUpload({ value, preview, onChange, label }) {
   return (
     <div>
       {preview ? (
-        <div className="relative w-full h-48 rounded-2xl overflow-hidden border border-gray-100 group">
+        <div className="relative w-full h-48 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 group">
           <img
             src={preview}
             alt="Preview"
@@ -222,7 +217,7 @@ function ImageUpload({ value, preview, onChange, label }) {
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="px-4 py-2 bg-white text-gray-900 text-xs font-semibold rounded-xl hover:bg-gray-100 transition-colors"
+              className="px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               Ganti Gambar
             </button>
@@ -243,16 +238,16 @@ function ImageUpload({ value, preview, onChange, label }) {
           onClick={() => inputRef.current?.click()}
           className={`w-full h-40 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
             drag
-              ? 'border-brand-purple bg-brand-pale/30'
-              : 'border-gray-200 hover:border-brand-purple hover:bg-brand-pale/20'
+              ? 'border-brand-purple bg-brand-pale/30 dark:bg-brand-purple/10'
+              : 'border-gray-200 dark:border-gray-700 hover:border-brand-purple hover:bg-brand-pale/20 dark:hover:bg-brand-purple/5'
           }`}
         >
-          <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-            <Image size={18} className="text-gray-400" />
+          <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center">
+            <Image size={18} className="text-gray-400 dark:text-gray-500" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-semibold text-gray-600">{label}</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{label}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               Drag & drop atau klik — PNG, JPG, WebP (max 2MB)
             </p>
           </div>
@@ -269,7 +264,6 @@ function ImageUpload({ value, preview, onChange, label }) {
   );
 }
 
-/* ── Toast ── */
 function Toast({ toast, onClose }) {
   useEffect(() => {
     if (!toast) return;
@@ -290,7 +284,6 @@ function Toast({ toast, onClose }) {
   );
 }
 
-/* ── Initial State ── */
 const INIT = {
   title:             '',
   category:          '',
@@ -306,7 +299,6 @@ const INIT = {
   order:             0,
 };
 
-/* ── Main Component ── */
 export default function ProjectForm() {
   const { id }       = useParams();
   const navigate     = useNavigate();
@@ -321,7 +313,7 @@ export default function ProjectForm() {
   const [toast,       setToast]       = useState(null);
   const [activeTab,   setActiveTab]   = useState('basic');
 
-  /* Fetch existing project */
+  
   useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
@@ -354,14 +346,14 @@ export default function ProjectForm() {
       .finally(() => setFetching(false));
   }, [id, isEdit]);
 
-  /* Update field helper */
+  
   const set = (field) => (val) =>
     setForm(prev => ({ ...prev, [field]: val }));
 
   const setE = (field) => (e) =>
     setForm(prev => ({ ...prev, [field]: e.target.value }));
 
-  /* Validate */
+  
   const validate = () => {
     const e = {};
     if (!form.title.trim())    e.title    = 'Judul wajib diisi';
@@ -370,7 +362,7 @@ export default function ProjectForm() {
     return e;
   };
 
-  /* Submit */
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
@@ -385,7 +377,7 @@ export default function ProjectForm() {
     try {
       const payload = new FormData();
 
-      /* Basic fields */
+      
       Object.entries(form).forEach(([key, val]) => {
         if (key === 'tags' || key === 'features' || key === 'tech_stack') {
           payload.append(key, JSON.stringify(val));
@@ -396,19 +388,17 @@ export default function ProjectForm() {
         }
       });
 
-      /* Thumbnail */
+      
       if (thumbnail) {
         payload.append('thumbnail', thumbnail);
       }
-
-      /* Laravel FormData needs _method for PUT */
-      if (isEdit) payload.append('_method', 'PUT');
 
       const url = isEdit
         ? `/admin/projects/${id}`
         : '/admin/projects';
 
-      await api.post(url, payload, {
+      const method = isEdit ? api.put : api.post;
+      await method(url, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -430,7 +420,7 @@ export default function ProjectForm() {
     }
   };
 
-  /* Tabs */
+  
   const TABS = [
     { key: 'basic',   label: 'Info Dasar',  hasError: !!(errors.title || errors.category || errors.description) },
     { key: 'detail',  label: 'Detail',      hasError: false },
@@ -442,8 +432,8 @@ export default function ProjectForm() {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="flex flex-col items-center gap-3">
-          <Loader size={24} className="text-brand-purple animate-spin" />
-          <p className="text-sm text-gray-400">Memuat data project...</p>
+          <Loader size={24} className="text-brand-purple dark:text-brand-light animate-spin" />
+          <p className="text-sm text-gray-400 dark:text-gray-500">Memuat data project...</p>
         </div>
       </div>
     );
@@ -452,19 +442,18 @@ export default function ProjectForm() {
   return (
     <div className="p-6 md:p-8 max-w-4xl mx-auto">
 
-      {/* ── Header ── */}
       <div className="flex items-center gap-4 mb-6">
         <Link
           to="/admin/projects"
-          className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
         >
           <ArrowLeft size={16} />
         </Link>
         <div>
-          <h1 className="font-sora font-bold text-xl text-gray-900">
+          <h1 className="font-sora font-bold text-xl text-gray-900 dark:text-white">
             {isEdit ? 'Edit Project' : 'Tambah Project Baru'}
           </h1>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
             {isEdit ? `Mengedit: ${form.title || '...'}` : 'Isi form di bawah untuk menambahkan project baru'}
           </p>
         </div>
@@ -472,7 +461,7 @@ export default function ProjectForm() {
           <Link
             to={`/projects/${id}`}
             target="_blank"
-            className="ml-auto flex items-center gap-1.5 px-3.5 py-2 border border-gray-200 text-xs font-semibold text-gray-500 rounded-xl hover:bg-gray-50 transition-colors"
+            className="ml-auto flex items-center gap-1.5 px-3.5 py-2 border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             <Eye size={13} />
             Preview
@@ -480,16 +469,15 @@ export default function ProjectForm() {
         )}
       </div>
 
-      {/* ── Tab Nav ── */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 overflow-x-auto scrollbar-none">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl mb-6 overflow-x-auto scrollbar-none">
         {TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold whitespace-nowrap transition-all min-w-fit ${
               activeTab === tab.key
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
             {tab.label}
@@ -503,7 +491,7 @@ export default function ProjectForm() {
       <form onSubmit={handleSubmit} noValidate>
         <div className="flex flex-col gap-5">
 
-          {/* ══ TAB: INFO DASAR ══ */}
+          
           {activeTab === 'basic' && (
             <>
               <FormSection
@@ -512,7 +500,7 @@ export default function ProjectForm() {
               >
                 <div className="flex flex-col gap-4">
 
-                  {/* Title */}
+                  
                   <FormField label="Judul Project" required error={errors.title}>
                     <input
                       type="text"
@@ -523,7 +511,7 @@ export default function ProjectForm() {
                     />
                   </FormField>
 
-                  {/* Short description */}
+                  
                   <FormField
                     label="Deskripsi Singkat"
                     hint={`${form.short_description.length}/120`}
@@ -538,7 +526,7 @@ export default function ProjectForm() {
                     />
                   </FormField>
 
-                  {/* Description */}
+                  
                   <FormField label="Deskripsi Lengkap" required error={errors.description}>
                     <textarea
                       value={form.description}
@@ -547,12 +535,12 @@ export default function ProjectForm() {
                       placeholder="Jelaskan project secara detail — latar belakang, tujuan, proses, dan hasil..."
                       className={`${inputClass} resize-none ${errors.description ? inputError : inputNormal}`}
                     />
-                    <p className="text-xs text-gray-300 mt-1 text-right">
+                    <p className="text-xs text-gray-300 dark:text-gray-600 mt-1 text-right">
                       {form.description.length} karakter
                     </p>
                   </FormField>
 
-                  {/* Tags */}
+                  
                   <FormField
                     label="Teknologi / Tags"
                     hint="Enter atau koma untuk tambah"
@@ -566,7 +554,7 @@ export default function ProjectForm() {
                 </div>
               </FormSection>
 
-              {/* Category */}
+              
               <FormSection title="Kategori" desc="Pilih satu kategori yang paling sesuai">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {CATEGORIES.map(cat => (
@@ -577,7 +565,7 @@ export default function ProjectForm() {
                       className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                         form.category === cat.key
                           ? cat.color + ' border-2'
-                          : 'border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200'
+                          : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-600'
                       }`}
                     >
                       <cat.icon size={22} />
@@ -595,10 +583,10 @@ export default function ProjectForm() {
             </>
           )}
 
-          {/* ══ TAB: DETAIL ══ */}
+          
           {activeTab === 'detail' && (
             <>
-              {/* Features */}
+              
               <FormSection
                 title="Fitur Utama"
                 desc="Daftar fitur yang dimiliki project ini"
@@ -614,7 +602,7 @@ export default function ProjectForm() {
                 />
               </FormSection>
 
-              {/* Tech Stack */}
+              
               <FormSection
                 title="Tech Stack"
                 desc="Teknologi yang digunakan dalam project ini"
@@ -632,10 +620,10 @@ export default function ProjectForm() {
             </>
           )}
 
-          {/* ══ TAB: MEDIA & URL ══ */}
+          
           {activeTab === 'media' && (
             <>
-              {/* Thumbnail */}
+              
               <FormSection
                 title="Thumbnail"
                 desc="Gambar utama yang mewakili project (rasio 16:9 disarankan)"
@@ -651,7 +639,7 @@ export default function ProjectForm() {
                 />
               </FormSection>
 
-              {/* URLs */}
+              
               <FormSection
                 title="Link Project"
                 desc="URL demo dan repository source code"
@@ -691,10 +679,10 @@ export default function ProjectForm() {
             </>
           )}
 
-          {/* ══ TAB: PUBLISH ══ */}
+          
           {activeTab === 'publish' && (
             <>
-              {/* Status */}
+              
               <FormSection
                 title="Status Publikasi"
                 desc="Tentukan apakah project ini tampil di website publik"
@@ -708,9 +696,9 @@ export default function ProjectForm() {
                       className={`flex items-start gap-3 p-4 rounded-2xl border-2 text-left transition-all ${
                         form.status === s.key
                           ? s.key === 'live'
-                            ? 'border-green-400 bg-green-50'
-                            : 'border-yellow-400 bg-yellow-50'
-                          : 'border-gray-100 bg-gray-50 hover:border-gray-200'
+                            ? 'border-green-400 bg-green-50 dark:bg-green-900/20'
+                            : 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20'
+                          : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:border-gray-200 dark:hover:border-gray-600'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 ${
@@ -718,13 +706,13 @@ export default function ProjectForm() {
                           ? s.key === 'live'
                             ? 'border-green-500 bg-green-500'
                             : 'border-yellow-500 bg-yellow-500'
-                          : 'border-gray-300'
+                          : 'border-gray-300 dark:border-gray-600'
                       }`} />
                       <div>
-                        <div className="font-semibold text-sm text-gray-900">
+                        <div className="font-semibold text-sm text-gray-900 dark:text-white">
                           {s.label}
                         </div>
-                        <div className="text-xs text-gray-400 mt-0.5">
+                        <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                           {s.desc}
                         </div>
                       </div>
@@ -733,20 +721,20 @@ export default function ProjectForm() {
                 </div>
               </FormSection>
 
-              {/* Options */}
+              
               <FormSection
                 title="Opsi Tambahan"
                 desc="Pengaturan tampilan project"
               >
                 <div className="flex flex-col gap-4">
 
-                  {/* Featured */}
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                  
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl">
                     <div>
-                      <div className="text-sm font-semibold text-gray-900">
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">
                         Featured Project
                       </div>
-                      <div className="text-xs text-gray-400 mt-0.5">
+                      <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                         Tampilkan di section "Featured Projects" halaman Home
                       </div>
                     </div>
@@ -754,7 +742,7 @@ export default function ProjectForm() {
                       type="button"
                       onClick={() => set('is_featured')(!form.is_featured)}
                       className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
-                        form.is_featured ? 'bg-brand-purple' : 'bg-gray-300'
+                        form.is_featured ? 'bg-brand-purple' : 'bg-gray-300 dark:bg-gray-600'
                       }`}
                     >
                       <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${
@@ -763,7 +751,7 @@ export default function ProjectForm() {
                     </button>
                   </div>
 
-                  {/* Order */}
+                  
                   <FormField
                     label="Urutan Tampil"
                     hint="Angka lebih kecil tampil lebih dulu"
@@ -780,9 +768,9 @@ export default function ProjectForm() {
                 </div>
               </FormSection>
 
-              {/* Summary */}
-              <div className="bg-brand-pale/50 rounded-2xl border border-brand-pale p-5">
-                <div className="text-xs font-semibold text-brand-purple uppercase tracking-wide mb-3">
+              
+              <div className="bg-brand-pale/50 dark:bg-brand-purple/5 rounded-2xl border border-brand-pale dark:border-brand-purple/20 p-5">
+                <div className="text-xs font-semibold text-brand-purple dark:text-brand-light uppercase tracking-wide mb-3">
                   Ringkasan
                 </div>
                 <div className="grid grid-cols-2 gap-y-2 text-sm">
@@ -797,8 +785,8 @@ export default function ProjectForm() {
                     { label: 'Thumbnail', val: thumbPreview ? '✓ Siap' : 'Belum ada' },
                   ].map(item => (
                     <div key={item.label} className="flex gap-2">
-                      <span className="text-gray-400 min-w-[80px]">{item.label}</span>
-                      <span className="font-semibold text-gray-700 capitalize truncate">
+                      <span className="text-gray-400 dark:text-gray-500 min-w-[80px]">{item.label}</span>
+                      <span className="font-semibold text-gray-700 dark:text-gray-200 capitalize truncate">
                         {item.val}
                       </span>
                     </div>
@@ -808,10 +796,9 @@ export default function ProjectForm() {
             </>
           )}
 
-          {/* ── Action Buttons ── */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
             <div className="flex gap-3">
-              {/* Prev / Next tab */}
+              
               {activeTab !== 'basic' && (
                 <button
                   type="button"
@@ -819,7 +806,7 @@ export default function ProjectForm() {
                     const idx = TABS.findIndex(t => t.key === activeTab);
                     setActiveTab(TABS[idx - 1].key);
                   }}
-                  className="px-4 py-2.5 border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   ← Sebelumnya
                 </button>
@@ -831,7 +818,7 @@ export default function ProjectForm() {
                     const idx = TABS.findIndex(t => t.key === activeTab);
                     setActiveTab(TABS[idx + 1].key);
                   }}
-                  className="px-4 py-2.5 border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   Selanjutnya →
                 </button>
@@ -841,7 +828,7 @@ export default function ProjectForm() {
             <div className="flex gap-3">
               <Link
                 to="/admin/projects"
-                className="px-5 py-2.5 border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                className="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 Batal
               </Link>

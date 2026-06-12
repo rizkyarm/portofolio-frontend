@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Mail, Phone, MapPin, Send,
@@ -7,47 +7,17 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { useDarkMode } from '../context/DarkModeContext';
+import SEO from '../components/shared/SEO';
+import Reveal from '../components/animations/Reveal';
+import useApiCache from '../hooks/useApiCache';
 
-/* ── Intersection Observer hook ── */
-function useReveal() {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.12 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, visible];
-}
-
-function Reveal({ children, className = '', delay = 0 }) {
-  const [ref, visible] = useReveal();
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)`,
-        transitionDelay: `${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-/* ── Data ── */
-const contactInfo = [
+// Default contact info fallback
+const defaultContactInfo = [
   {
     icon: Mail,
     label: 'Email',
-    value: 'rizki@portfolio.com',
-    href: 'mailto:rizki@portfolio.com',
+    value: 'email@example.com',
+    href: 'mailto:email@example.com',
     color: '#6c5ce7',
     bg: 'bg-green-50',
     darkBg: 'bg-green-500/20',
@@ -64,7 +34,7 @@ const contactInfo = [
   {
     icon: MapPin,
     label: 'Lokasi',
-    value: 'Bandar Lampung, Lampung',
+    value: 'Lokasi belum diset',
     href: 'https://maps.google.com',
     color: '#e84393',
     bg: 'bg-pink-50',
@@ -80,6 +50,53 @@ const contactInfo = [
     darkBg: 'bg-amber-500/20',
   },
 ];
+
+// Transform backend profile data to contactInfo structure
+function mapProfileToContactInfo(profile) {
+  if (!profile) return defaultContactInfo;
+
+  const contactInfo = [...defaultContactInfo];
+  
+  // Update Email
+  if (profile.email) {
+    contactInfo[0] = {
+      ...contactInfo[0],
+      value: profile.email,
+      href: `mailto:${profile.email}`,
+    };
+  }
+
+  // Update WhatsApp
+  if (profile.phone) {
+    const phoneWithoutSpaces = profile.phone.replace(/\s+/g, '');
+    const whatsappNumber = phoneWithoutSpaces.startsWith('+') 
+      ? phoneWithoutSpaces.replace('+', '') 
+      : phoneWithoutSpaces;
+    contactInfo[1] = {
+      ...contactInfo[1],
+      value: profile.phone,
+      href: `https://wa.me/${whatsappNumber}`,
+    };
+  }
+
+  // Update Location
+  if (profile.location) {
+    contactInfo[2] = {
+      ...contactInfo[2],
+      value: profile.location,
+    };
+  }
+
+  // Update Working Hours (if available in profile)
+  if (profile.working_hours) {
+    contactInfo[3] = {
+      ...contactInfo[3],
+      value: profile.working_hours,
+    };
+  }
+
+  return contactInfo;
+}
 
 const socials = [];
 
@@ -115,7 +132,6 @@ const faqs = [
   },
 ];
 
-/* ── Input Component ── */
 function FormInput({ label, error, children, isDarkMode }) {
   return (
     <div className="flex flex-col">
@@ -133,7 +149,6 @@ function FormInput({ label, error, children, isDarkMode }) {
   );
 }
 
-/* ── FAQ Accordion Item ── */
 function FaqItem({ faq, isDarkMode }) {
   const [open, setOpen] = useState(false);
   return (
@@ -174,9 +189,17 @@ function FaqItem({ faq, isDarkMode }) {
   );
 }
 
-/* ── Main Component ── */
 export default function Contact() {
   const { isDarkMode } = useDarkMode();
+  
+  // Fetch profile data from backend
+  const { data: profile = null, loading: profileLoading } = useApiCache('/profile', {
+    transform: (res) => res.data?.data || res.data,
+    initialValue: null,
+  });
+  
+  // Map profile data to contact info
+  const contactInfo = mapProfileToContactInfo(profile);
   
   const [form, setForm] = useState({
     name: '', email: '', subject: '', service: '', budget: '', body: '',
@@ -190,31 +213,83 @@ export default function Contact() {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Nama wajib diisi';
-    if (!form.email.trim()) e.email = 'Email wajib diisi';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Format email tidak valid';
-    if (!form.body.trim()) e.body = 'Pesan wajib diisi';
-    else if (form.body.trim().length < 10) e.body = 'Pesan minimal 10 karakter';
+    
+    // Validate name
+    if (!form.name.trim()) {
+      e.name = 'Nama wajib diisi';
+    } else if (form.name.trim().length < 3) {
+      e.name = 'Nama minimal 3 karakter';
+    }
+    
+    // Validate email
+    if (!form.email.trim()) {
+      e.email = 'Email wajib diisi';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      e.email = 'Format email tidak valid (contoh: user@example.com)';
+    }
+    
+    // Validate message body
+    if (!form.body.trim()) {
+      e.body = 'Pesan wajib diisi';
+    } else if (form.body.trim().length < 10) {
+      e.body = 'Pesan minimal 10 karakter untuk detail yang cukup';
+    } else if (form.body.trim().length > 2000) {
+      e.body = 'Pesan maksimal 2000 karakter';
+    }
+    
     return e;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form
     const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    if (Object.keys(errs).length > 0) { 
+      setErrors(errs); 
+      return; 
+    }
+    
     setErrors({});
     setStatus('loading');
+    
     try {
-      await api.post('/messages', {
-        name: form.name,
-        email: form.email,
-        subject: form.subject || form.service,
-        body: form.body,
+      // Send message to backend
+      const response = await api.post('/messages', {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        subject: form.subject.trim() || form.service,
+        body: form.body.trim(),
       });
-      setStatus('success');
-      setForm({ name: '', email: '', subject: '', service: '', budget: '', body: '' });
-    } catch {
+
+      // Check if response is successful
+      if (response.status === 200 || response.status === 201) {
+        setStatus('success');
+        // Reset form after successful submission
+        setForm({ 
+          name: '', 
+          email: '', 
+          subject: '', 
+          service: '', 
+          budget: '', 
+          body: '' 
+        });
+        // Auto reset success message after 5 seconds
+        setTimeout(() => setStatus('idle'), 5000);
+      }
+    } catch (error) {
+      console.error('[Contact] Error submitting form:', error);
       setStatus('error');
+      
+      // Provide specific error feedback
+      if (error.response?.status === 422) {
+        // Validation error from backend
+        const backendErrors = error.response.data?.errors || {};
+        setErrors(backendErrors);
+      } else if (error.response?.status >= 500) {
+        // Server error
+        console.error('Server error:', error.response.data);
+      }
     }
   };
 
@@ -226,8 +301,13 @@ export default function Contact() {
 
   return (
     <div className={`overflow-x-hidden font-sans transition-colors duration-300 ${isDarkMode ? 'bg-slate-950' : 'bg-slate-50'}`}>
+      <SEO
+        title="Contact"
+        description="Get in touch with Rizki Aditiya Ramadan for project inquiries, collaborations, or just to say hello."
+        path="/contact"
+      />
 
-      {/* ══ HERO ══ */}
+      
       <section className="relative bg-slate-900 overflow-hidden py-24 sm:py-32">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-green-600/20 blur-[100px]" />
@@ -264,11 +344,10 @@ export default function Contact() {
         `}</style>
       </section>
 
-      {/* ══ MAIN CONTENT ══ */}
+      
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-14">
 
-          {/* ── LEFT — Contact Info ── */}
           <div className="lg:col-span-2 flex flex-col gap-8">
             <Reveal>
               <h2 className={`font-bold text-3xl tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -331,12 +410,14 @@ export default function Contact() {
               <div className="bg-slate-900 rounded-2xl p-5 flex items-center gap-4 shadow-xl shadow-slate-900/10 border border-slate-800">
                 <div className="relative flex-shrink-0">
                   <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center font-bold text-white text-lg shadow-inner">
-                    RR
+                    {profile?.name ? profile.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'RR'}
                   </div>
                   <div className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-400 rounded-full border-2 border-slate-900 animate-pulse" />
                 </div>
                 <div>
-                  <div className="text-white font-bold text-base">Rizki Aditiya Ramadan</div>
+                  <div className="text-white font-bold text-base">
+                    {profile?.name || 'Rizki Aditiya Ramadan'}
+                  </div>
                   <div className="text-emerald-400 text-xs font-semibold mt-1 flex items-center gap-1.5">
                     <span className="w-2 h-2 bg-emerald-400 rounded-full inline-block shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                     Tersedia untuk project baru
@@ -346,7 +427,6 @@ export default function Contact() {
             </Reveal>
           </div>
 
-          {/* ── RIGHT — Form ── */}
           <div className="lg:col-span-3">
             <Reveal>
               <div className={`flex gap-2 mb-8 p-1.5 rounded-xl w-fit mx-auto lg:mx-0 ${isDarkMode ? 'bg-slate-800/50' : 'bg-slate-200/50'}`}>
@@ -369,7 +449,6 @@ export default function Contact() {
               </div>
             </Reveal>
 
-            {/* ── FORM TAB ── */}
             {activeTab === 'form' && (
               <Reveal>
                 {status === 'success' ? (
@@ -488,7 +567,6 @@ export default function Contact() {
               </Reveal>
             )}
 
-            {/* ── FAQ TAB ── */}
             {activeTab === 'faq' && (
               <Reveal>
                 <div className={`rounded-3xl border p-6 sm:p-10 ${isDarkMode ? 'bg-slate-900 border-slate-800 shadow-2xl shadow-black/40' : 'bg-white border-slate-100 shadow-xl shadow-slate-200/20'}`}>
@@ -522,7 +600,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* ══ MAP / LOCATION BANNER ══ */}
+      
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 sm:pb-24">
         <Reveal>
           <div className="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl shadow-slate-900/20 border border-slate-800">
@@ -539,7 +617,7 @@ export default function Contact() {
                       referrerPolicy="no-referrer-when-downgrade"
                     ></iframe>
 
-                    {/* Overlay UI */}
+                    
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-950/60 group-hover:bg-slate-950/20 transition-colors duration-700 pointer-events-none">
                       
                       <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.4)] group-hover:-translate-y-4 group-hover:scale-110 transition-all duration-500">

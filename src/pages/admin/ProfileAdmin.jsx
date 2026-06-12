@@ -10,7 +10,6 @@ import {
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-/* ── Toast ── */
 function Toast({ toast, onClose }) {
   useEffect(() => {
     if (!toast) return;
@@ -31,7 +30,6 @@ function Toast({ toast, onClose }) {
   );
 }
 
-/* ── Avatar Upload ── */
 function AvatarUpload({ preview, onChange, name }) {
   const { isDarkMode } = useDarkMode();
   const ref = useRef(null);
@@ -72,7 +70,6 @@ function AvatarUpload({ preview, onChange, name }) {
   );
 }
 
-/* ── Section wrapper ── */
 function Section({ title, desc, children }) {
   const { isDarkMode } = useDarkMode();
   return (
@@ -89,7 +86,6 @@ function Section({ title, desc, children }) {
   );
 }
 
-/* ── Input ── */
 function Field({ label, icon: Icon, error, hint, children }) {
   const { isDarkMode } = useDarkMode();
   return (
@@ -215,27 +211,21 @@ export default function ProfileAdmin() {
       stats: { ...prev.stats, [key]: Number(e.target.value) },
     }));
 
-  /* Save profile */
   const handleSave = async () => {
     setSaving(true);
     try {
       const payload = new FormData();
       
-      // Basic text fields
       ['name', 'tagline', 'bio', 'email', 'phone', 'location', 'cv_url'].forEach(k => {
         payload.append(k, form[k] || '');
       });
 
-      // Format Object menjadi Associative Array untuk Laravel
       Object.entries(form.socials).forEach(([k, v]) => payload.append(`socials[${k}]`, v || ''));
       Object.entries(form.stats).forEach(([k, v]) => payload.append(`stats[${k}]`, v || 0));
 
       if (avatar) payload.append('avatar', avatar);
 
-      // Selalu gunakan PUT via POST untuk Upsert di Laravel
-      payload.append('_method', 'PUT');
-
-      await api.post('/admin/profile', payload, {
+      await api.put('/admin/profile', payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       
@@ -249,7 +239,7 @@ export default function ProfileAdmin() {
     }
   };
 
-  /* Change password */
+  
   const handleChangePassword = async () => {
     const e = {};
     if (!passForm.current)                         e.current  = 'Wajib diisi';
@@ -260,7 +250,7 @@ export default function ProfileAdmin() {
     setErrors({});
     setSaving(true);
     try {
-      await api.put('/admin/profile', { // Pastikan endpoint ini ditangani di backend
+      await api.put('/admin/profile', {
         current_password:      passForm.current,
         password:              passForm.new,
         password_confirmation: passForm.confirm,
@@ -288,7 +278,6 @@ export default function ProfileAdmin() {
     <div className={`p-6 md:p-8 max-w-full mx-auto min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
       <div className="max-w-5xl mx-auto">
 
-        {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className={`font-sora font-bold text-2xl ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>
@@ -313,12 +302,11 @@ export default function ProfileAdmin() {
           </div>
         </div>
 
-        {/* ── Layout: Avatar + Form ── */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
-          {/* Left sidebar */}
+          
           <div className="flex flex-col gap-5">
-            {/* Avatar card */}
+            
             <div className={`rounded-2xl border p-6 text-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
               <AvatarUpload
                 preview={avatarPreview}
@@ -334,7 +322,7 @@ export default function ProfileAdmin() {
                 </div>
               </div>
 
-              {/* Live preview stats */}
+              
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {[
                   { label: 'Projects', val: form.stats.projects },
@@ -349,7 +337,7 @@ export default function ProfileAdmin() {
                 ))}
               </div>
 
-              {/* Available badge */}
+              
               <div className={`mt-4 flex items-center justify-center gap-2 text-xs font-semibold text-emerald-500 py-2 px-3 rounded-xl 
                 ${isDarkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'}`}>
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
@@ -357,7 +345,7 @@ export default function ProfileAdmin() {
               </div>
             </div>
 
-            {/* Tabs */}
+            
             <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
               {TABS.map((tab, i) => {
                 const isActive = activeTab === tab.key;
@@ -376,10 +364,9 @@ export default function ProfileAdmin() {
             </div>
           </div>
 
-          {/* Right content */}
+          
           <div className="md:col-span-3 flex flex-col gap-5">
 
-            {/* ── PERSONAL TAB ── */}
             {activeTab === 'personal' && (
               <>
                 <Section title="Informasi Personal" desc="Data dasar yang tampil di halaman About">
@@ -424,7 +411,6 @@ export default function ProfileAdmin() {
               </>
             )}
 
-            {/* ── SOCIALS TAB ── */}
             {activeTab === 'socials' && (
               <Section title="Media Sosial" desc="Link profil sosial yang tampil di website">
                 <div className="flex flex-col gap-4">
@@ -460,7 +446,6 @@ export default function ProfileAdmin() {
               </Section>
             )}
 
-            {/* ── STATS TAB ── */}
             {activeTab === 'stats' && (
               <Section title="Statistik Portfolio" desc="Angka yang tampil di hero section dan halaman About">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -499,7 +484,7 @@ export default function ProfileAdmin() {
                   ))}
                 </div>
 
-                {/* Preview */}
+                
                 <div className={`mt-5 rounded-2xl border p-5 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
                   <div className={`text-xs font-semibold uppercase tracking-widest mb-3 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                     Preview di Hero Section
@@ -523,7 +508,6 @@ export default function ProfileAdmin() {
               </Section>
             )}
 
-            {/* ── ACCOUNT TAB ── */}
             {activeTab === 'account' && (
               <>
                 <Section title="Informasi Akun" desc="Data login admin panel">
@@ -573,7 +557,7 @@ export default function ProfileAdmin() {
                       </div>
                     ))}
 
-                    {/* Password strength */}
+                    
                     {passForm.new && (
                       <div>
                         <div className={`flex justify-between text-xs mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -601,7 +585,7 @@ export default function ProfileAdmin() {
                   </div>
                 </Section>
 
-                {/* Danger zone */}
+                
                 <div className={`rounded-2xl border-2 overflow-hidden 
                   ${isDarkMode ? 'border-red-900/50 bg-red-950/20' : 'border-red-200 bg-white'}`}>
                   <div className={`px-6 py-4 border-b ${isDarkMode ? 'border-red-900/50' : 'border-red-100'}`}>
@@ -629,7 +613,6 @@ export default function ProfileAdmin() {
           </div>
         </div>
 
-        {/* ── Bottom Save Bar ── */}
         <div className={`fixed bottom-0 left-0 right-0 border-t px-6 py-4 flex items-center justify-between z-30 
           ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
           <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -643,7 +626,7 @@ export default function ProfileAdmin() {
           </button>
         </div>
 
-        {/* Bottom padding for fixed bar */}
+        
         <div className="h-20" />
       </div>
 
