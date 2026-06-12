@@ -99,6 +99,26 @@ function Reveal({ children, className = '', delay = 0 }) {
   );
 }
 
+/* ── MinIO URL Transformer ── */
+function transformMinioToProxy(url) {
+  if (!url) return url;
+  const prefix = 'http://localhost:9000/my-bucket/';
+  if (!url.startsWith(prefix)) return url;
+
+  // Pisahkan path & query string
+  const afterBucket = url.substring(prefix.length);
+  const questionIdx = afterBucket.indexOf('?');
+  const filePath = questionIdx >= 0 ? afterBucket.substring(0, questionIdx) : afterBucket;
+  const queryString = questionIdx >= 0 ? afterBucket.substring(questionIdx + 1) : '';
+
+  // Encode path: / → %2F
+  const encodedPath = filePath.replace(/\//g, '%2F');
+
+  // Build proxy URL melalui Vercel rewrite → backend → MinIO
+  const proxyUrl = `/api/v1/files/proxy/${encodedPath}`;
+  return queryString ? `${proxyUrl}?${queryString}` : proxyUrl;
+}
+
 /* ── Main Component ── */
 export default function About() {
   const { isDarkMode } = useDarkMode();
@@ -114,6 +134,10 @@ export default function About() {
           console.warn('[About] Failed to parse stats JSON:', e);
           raw.stats = {}; 
         }
+      }
+      // Transform MinIO local URL → proxy endpoint
+      if (raw?.avatar) {
+        raw.avatar = transformMinioToProxy(raw.avatar);
       }
       return raw || null;
     },
