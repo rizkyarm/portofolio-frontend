@@ -17,7 +17,7 @@ export default function SEO({
 }) {
   const siteTitle = 'Rizki Aditiya Ramadan';
   const fullTitle = title ? `${title} — ${siteTitle}` : siteTitle;
-  const siteUrl = 'https://rizkiaditiya.com';
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://portofolio-sigma-three-11.vercel.app';
   const canonicalUrl = `${siteUrl}${path}`;
   const ogImage = image || `${siteUrl}/og-image.png`;
 
