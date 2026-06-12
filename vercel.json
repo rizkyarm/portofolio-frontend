@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/v1/(.*)",
-      "destination": "https://urban-symbols-thou-procedure.trycloudflare.com/api/v1/$1"
+      "destination": "https://whale-flooring-lemon-mathematical.trycloudflare.com/api/v1/$1"
     },
     {
       "source": "/((?!api).*)",
