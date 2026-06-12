@@ -7,6 +7,7 @@ import {
 import { useDarkMode } from '../context/DarkModeContext';
 import SEO from '../components/shared/SEO';
 import useApiCache from '../hooks/useApiCache';
+import { getFileUrl } from '../utils/media';
 
 /* ── Kategori config ── */
 const CATEGORIES = [
@@ -99,26 +100,6 @@ function Reveal({ children, className = '', delay = 0 }) {
   );
 }
 
-/* ── MinIO URL Transformer ── */
-function transformMinioToProxy(url) {
-  if (!url) return url;
-  const prefix = 'http://localhost:9000/my-bucket/';
-  if (!url.startsWith(prefix)) return url;
-
-  // Pisahkan path & query string
-  const afterBucket = url.substring(prefix.length);
-  const questionIdx = afterBucket.indexOf('?');
-  const filePath = questionIdx >= 0 ? afterBucket.substring(0, questionIdx) : afterBucket;
-  const queryString = questionIdx >= 0 ? afterBucket.substring(questionIdx + 1) : '';
-
-  // Encode path: / → %2F
-  const encodedPath = filePath.replace(/\//g, '%2F');
-
-  // Build proxy URL melalui Vercel rewrite → backend → MinIO
-  const proxyUrl = `/api/v1/files/proxy/${encodedPath}`;
-  return queryString ? `${proxyUrl}?${queryString}` : proxyUrl;
-}
-
 /* ── Main Component ── */
 export default function About() {
   const { isDarkMode } = useDarkMode();
@@ -136,9 +117,8 @@ export default function About() {
         }
       }
       // Transform MinIO local URL → proxy endpoint
-      if (raw?.avatar) {
-        raw.avatar = transformMinioToProxy(raw.avatar);
-      }
+      if (raw?.avatar) raw.avatar = getFileUrl(raw.avatar);
+      if (raw?.cv_url) raw.cv_url = getFileUrl(raw.cv_url);
       return raw || null;
     },
     initialValue: null,

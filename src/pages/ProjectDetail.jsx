@@ -10,6 +10,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import SEO from '../components/shared/SEO';
 import Reveal from '../components/animations/Reveal';
 import useApiCache from '../hooks/useApiCache';
+import { getFileUrl, transformProjectMedia } from '../utils/media';
 
 const categoryConfig = {
   website: {
@@ -88,10 +89,22 @@ export default function ProjectDetail() {
   const { slug }          = useParams();
   const navigate          = useNavigate();
   const { data: project, loading: detailLoading } = useApiCache(`/projects/${slug}`, {
-    transform: (res) => res.data.data || res.data,
+    transform: (res) => {
+      const raw = res.data.data || res.data;
+      return raw ? transformProjectMedia(raw) : null;
+    },
     initialValue: null,
   });
-  const { data: allProjects = [], loading: listLoading } = useApiCache('/projects', { initialValue: [] });
+  const { data: allProjects = [], loading: listLoading } = useApiCache('/projects', {
+    initialValue: [],
+    transform: (res) => {
+      const data = res.data?.data || res.data || [];
+      return (Array.isArray(data) ? data : []).map(p => ({
+        ...p,
+        thumbnail: getFileUrl(p.thumbnail),
+      }));
+    },
+  });
   const [activeTab, setActiveTab] = useState('overview');
   const [lightbox, setLightbox] = useState(null);
   const tabRef = useRef(null);

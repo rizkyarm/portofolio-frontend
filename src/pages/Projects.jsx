@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkModeContext';
 import SEO from '../components/shared/SEO';
 import useApiCache from '../hooks/useApiCache';
+import { getFileUrl } from '../utils/media';
 
 const categoryColors = {
   website: 'from-indigo-500 to-green-600',
@@ -20,7 +21,17 @@ const categoryLabel = {
 
 export default function Projects() {
   const { isDarkMode } = useDarkMode();
-  const { data: projects = [], loading, fromCache } = useApiCache('/projects', { initialValue: [] });
+  const { data: projects = [], loading, fromCache } = useApiCache('/projects', {
+    initialValue: [],
+    transform: (res) => {
+      const data = res.data?.data || res.data || [];
+      // Transform all thumbnail URLs
+      return (Array.isArray(data) ? data : []).map(p => ({
+        ...p,
+        thumbnail: getFileUrl(p.thumbnail),
+      }));
+    },
+  });
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 

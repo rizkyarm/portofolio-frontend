@@ -11,6 +11,7 @@ import Button from '../components/ui/Button';
 import Reveal from '../components/animations/Reveal';
 import SEO from '../components/shared/SEO';
 import useApiCache from '../hooks/useApiCache';
+import { getFileUrl } from '../utils/media';
 
 const categories = [
   { key: 'all',     label: 'All Projects', icon: null },
@@ -27,7 +28,16 @@ const stats = [
 ];
 
 export default function Home() {
-  const { data: projects = [], loading: projLoading, fromCache: projCache, refetch: refetchProjects } = useApiCache('/projects', { initialValue: [] });
+  const { data: projects = [], loading: projLoading, fromCache: projCache, refetch: refetchProjects } = useApiCache('/projects', {
+    initialValue: [],
+    transform: (res) => {
+      const data = res.data?.data || res.data || [];
+      return (Array.isArray(data) ? data : []).map(p => ({
+        ...p,
+        thumbnail: getFileUrl(p.thumbnail),
+      }));
+    },
+  });
   const { data: skills = [], loading: skillLoading, fromCache: skillCache } = useApiCache('/skills', { initialValue: [] });
   const { data: services = [], loading: svcLoading, fromCache: svcCache } = useApiCache('/services', { initialValue: [] });
   const { data: profile, loading: profLoading, fromCache: profCache } = useApiCache('/profile', {
@@ -36,6 +46,8 @@ export default function Home() {
       if (raw?.stats && typeof raw.stats === 'string') {
         try { raw.stats = JSON.parse(raw.stats); } catch { /* keep string */ }
       }
+      // Transform MinIO URLs
+      if (raw?.cv_url) raw.cv_url = getFileUrl(raw.cv_url);
       return raw;
     },
     initialValue: null,
@@ -128,7 +140,7 @@ export default function Home() {
               </Button>
             </Link>
             {profile?.cv_url && (
-              <a href={`${API_URL}/storage/${profile.cv_url}`} target="_blank" rel="noreferrer">
+              <a href={profile.cv_url} target="_blank" rel="noreferrer">
                 <Button variant="secondary" size="lg" icon={Download}>
                   Download CV
                 </Button>
