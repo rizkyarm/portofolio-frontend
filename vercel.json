@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/v1/(.*)",
-      "destination": "https://flowers-tell-group-tale.trycloudflare.com/api/v1/$1"
+      "destination": "https://houses-maintenance-constitutes-action.trycloudflare.com/api/v1/$1"
     },
     {
       "source": "/((?!api).*)",
