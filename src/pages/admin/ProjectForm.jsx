@@ -482,7 +482,9 @@ export default function ProjectForm() {
         : '/admin/projects';
 
       const method = isEdit ? api.put : api.post;
-      await method(url, projectData); // 
+      
+      console.log('[handleSubmit] Sending:', { url, data: projectData });
+      await method(url, projectData); 
 
       setToast({
         type: 'success',
@@ -492,6 +494,10 @@ export default function ProjectForm() {
       setTimeout(() => navigate('/admin/projects'), 1500);
     } catch (err) {
       const msg = err?.response?.data?.message || 'Terjadi kesalahan. Coba lagi.';
+      console.error('[handleSubmit] Error:', {
+        status: err?.response?.status,
+        body: err?.response?.data,
+      });
       setToast({ type: 'error', message: msg });
 
       if (err?.response?.data?.errors) {
