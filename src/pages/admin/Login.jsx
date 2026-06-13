@@ -130,7 +130,7 @@ export default function Login() {
         {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between px-6 py-5 border-b border-gray-100">
           <Link to="/" className="font-sora font-bold text-lg">
-            <span className="text-brand-purple">AK</span>
+            <span className="text-brand-purple">Rizki Aditiya</span>
             <span className="text-gray-900"> Portfolio</span>
           </Link>
           <Link
@@ -151,7 +151,7 @@ export default function Login() {
               <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-pale rounded-2xl mb-5">
                 <Lock size={20} className="text-brand-purple" />
               </div>
-              <h2 className="font-sora font-bold text-2xl text-gray-900 mb-1">
+              <h2 className="font-sora font-bold text-2xl text-white mb-1">
                 Selamat datang!
               </h2>
               <p className="text-gray-400 text-sm">
@@ -172,7 +172,7 @@ export default function Login() {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                <label className="block text-sm font-semibold text-white mb-1.5">
                   Email
                 </label>
                 <div className="relative">
@@ -202,7 +202,7 @@ export default function Login() {
               {/* Password */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-semibold text-gray-700">
+                  <label className="text-sm font-semibold text-white">
                     Password
                   </label>
                 </div>
