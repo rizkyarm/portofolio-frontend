@@ -194,7 +194,7 @@ function ImageUpload({ value, preview, onChange, label }) {
       alert('Ukuran gambar maksimal 5MB');
       return;
     }
-    // Compress image before upload (keep good quality)
+    // Compress image
     const compressed = await compressImage(file, {
       maxWidth: 1200,
       maxHeight: 1200,
@@ -448,9 +448,7 @@ export default function ProjectForm() {
         : '/admin/projects';
 
       const method = isEdit ? api.put : api.post;
-      await method(url, payload, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await method(url, payload); // axios auto-set Content-Type + boundary for FormData
 
       setToast({
         type: 'success',
