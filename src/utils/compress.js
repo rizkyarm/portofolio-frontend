@@ -50,17 +50,16 @@ export async function compressImage(file, options = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Try WebP first (better compression), fallback to JPEG
-      const mimeType = 'image/webp';
+      // Use JPEG for maximum backend compatibility (WebP not always supported)
+      const mimeType = 'image/jpeg';
       canvas.toBlob(
         (blob) => {
           if (!blob) {
-            // Fallback: return original file
             resolve(file);
             return;
           }
 
-          const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), {
+          const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
             type: mimeType,
             lastModified: Date.now(),
           });
