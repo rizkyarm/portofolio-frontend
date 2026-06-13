@@ -445,68 +445,43 @@ export default function ProjectForm() {
     setLoading(true);
 
     try {
-      let thumbnailPath = undefined;
+    
+      const payload = new FormData();
+
+      // Append semua text fields
+      Object.entries(form).forEach(([key, val]) => {
+        if (key === 'tags' || key === 'features' || key === 'tech_stack') {
+          payload.append(key, JSON.stringify(val));
+        } else if (key === 'is_featured') {
+          payload.append(key, val ? '1' : '0');
+        } else {
+          payload.append(key, val ?? '');
+        }
+      });
+
+      // Thumbnail: kirim File object (POST), atau File jika ada yg baru (PUT)
       if (thumbnail) {
-        thumbnailPath = await uploadFile(thumbnail);
+        payload.append('thumbnail', thumbnail, thumbnail.name);
       }
 
-
-      const newImagePaths = [];
-      for (const file of images) {
-        const path = await uploadFile(file);
-        if (path) newImagePaths.push(path);
-      }
-  
-      const allImagePaths = [...existingImgs, ...newImagePaths];
-
-      const finalThumb   = thumbnailPath ?? existingThumb;
-      const finalImages  = allImagePaths.length > 0 ? allImagePaths : existingImgs;
+      // Images: kirim File objects (POST), atau Files jika ada yg baru (PUT)
+      images.forEach((file) => {
+        payload.append('images', file, file.name);
+      });
 
       const url = isEdit
         ? `/admin/projects/${id}`
         : '/admin/projects';
 
-      if (isEdit) {
-       
-        const jsonPayload = { ...form };
-        jsonPayload.tags       = form.tags;
-        jsonPayload.features   = form.features;
-        jsonPayload.tech_stack = form.tech_stack;
-        jsonPayload.is_featured = form.is_featured;
+      const method = isEdit ? api.put : api.post;
 
-        if (finalThumb)    jsonPayload.thumbnail = finalThumb;
-        if (finalImages.length > 0) jsonPayload.images = finalImages;
+      const debugData = {};
+      payload.forEach((v, k) => {
+        debugData[k] = v instanceof File ? `[File: ${v.name} (${(v.size/1024).toFixed(1)}KB)]` : v;
+      });
+      console.log(`[handleSubmit] Sending multipart (${isEdit ? 'PUT' : 'POST'}):`, { url, ...debugData });
 
-        console.log('[handleSubmit] Sending JSON (PUT):', { url, ...jsonPayload });
-        await api.put(url, jsonPayload);
-      } else {
-        
-        const payload = new FormData();
-
-        Object.entries(form).forEach(([key, val]) => {
-          if (key === 'tags' || key === 'features' || key === 'tech_stack') {
-            payload.append(key, JSON.stringify(val));
-          } else if (key === 'is_featured') {
-            payload.append(key, val ? '1' : '0');
-          } else {
-            payload.append(key, val ?? '');
-          }
-        });
-
-        if (finalThumb) {
-          payload.append('thumbnail', finalThumb);
-        }
-
-        if (finalImages.length > 0) {
-          payload.append('images', JSON.stringify(finalImages));
-        }
-
-        const debugData = {};
-        payload.forEach((v, k) => { debugData[k] = v instanceof File ? `[File: ${v.name}]` : v; });
-        console.log('[handleSubmit] Sending FormData (POST):', { url, ...debugData });
-
-        await api.post(url, payload);
-      } 
+      await method(url, payload);
 
       setToast({
         type: 'success',
