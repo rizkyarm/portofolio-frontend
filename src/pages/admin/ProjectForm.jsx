@@ -459,43 +459,52 @@ export default function ProjectForm() {
   
       const allImagePaths = [...existingImgs, ...newImagePaths];
 
-      // Kirim sebagai FormData — backend terima thumbnail & images sebagai URL string
-      const payload = new FormData();
-
-      Object.entries(form).forEach(([key, val]) => {
-        if (key === 'tags' || key === 'features' || key === 'tech_stack') {
-          payload.append(key, JSON.stringify(val));
-        } else if (key === 'is_featured') {
-          payload.append(key, val ? '1' : '0');
-        } else {
-          payload.append(key, val ?? '');
-        }
-      });
-
-      // Thumbnail: kirim URL string (new upload, atau existing saat edit)
-      const finalThumb = thumbnailPath ?? existingThumb;
-      if (finalThumb) {
-        payload.append('thumbnail', finalThumb);
-      }
-
-      // Images: kirim sebagai JSON array (new + existing, atau existing only)
-      const finalImages = allImagePaths.length > 0 ? allImagePaths : existingImgs;
-      if (finalImages.length > 0) {
-        payload.append('images', JSON.stringify(finalImages));
-      }
-
+      // Kirim sebagai FormData untuk POST, JSON untuk PUT
       const url = isEdit
         ? `/admin/projects/${id}`
         : '/admin/projects';
 
-      const method = isEdit ? api.put : api.post;
-      
-      // Debug: log all FormData entries
-      const debugData = {};
-      payload.forEach((v, k) => { debugData[k] = v instanceof File ? `[File: ${v.name}]` : v; });
-      console.log('[handleSubmit] Sending FormData:', { url, ...debugData });
-      
-      await method(url, payload); 
+      if (isEdit) {
+        // PUT — kirim sebagai JSON (Laravel PUT + multipart sering bermasalah)
+        const jsonPayload = { ...form };
+        jsonPayload.tags       = form.tags;
+        jsonPayload.features   = form.features;
+        jsonPayload.tech_stack = form.tech_stack;
+        jsonPayload.is_featured = form.is_featured;
+
+        if (finalThumb)    jsonPayload.thumbnail = finalThumb;
+        if (finalImages.length > 0) jsonPayload.images = finalImages;
+
+        console.log('[handleSubmit] Sending JSON (PUT):', { url, ...jsonPayload });
+        await api.put(url, jsonPayload);
+      } else {
+        // POST — kirim sebagai FormData
+        const payload = new FormData();
+
+        Object.entries(form).forEach(([key, val]) => {
+          if (key === 'tags' || key === 'features' || key === 'tech_stack') {
+            payload.append(key, JSON.stringify(val));
+          } else if (key === 'is_featured') {
+            payload.append(key, val ? '1' : '0');
+          } else {
+            payload.append(key, val ?? '');
+          }
+        });
+
+        if (finalThumb) {
+          payload.append('thumbnail', finalThumb);
+        }
+
+        if (finalImages.length > 0) {
+          payload.append('images', JSON.stringify(finalImages));
+        }
+
+        const debugData = {};
+        payload.forEach((v, k) => { debugData[k] = v instanceof File ? `[File: ${v.name}]` : v; });
+        console.log('[handleSubmit] Sending FormData (POST):', { url, ...debugData });
+
+        await api.post(url, payload);
+      } 
 
       setToast({
         type: 'success',
