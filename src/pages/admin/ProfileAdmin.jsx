@@ -225,9 +225,7 @@ export default function ProfileAdmin() {
 
       if (avatar) payload.append('avatar', avatar);
 
-      await api.put('/admin/profile', payload, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await api.put('/admin/profile', payload);
       
       setToast({ type: 'success', message: 'Profil berhasil diperbarui!' });
       await fetchProfile();
