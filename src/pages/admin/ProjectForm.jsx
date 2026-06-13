@@ -409,14 +409,8 @@ export default function ProjectForm() {
     const fd = new FormData();
     fd.append('file', file);
     try {
-      const { default: axios } = await import('axios');
-      const token = localStorage.getItem('admin_token');
-      const res = await axios.post('/api/v1/files/upload',
-        fd,
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
+      const { default: api } = await import('../../services/api');
+      const res = await api.post('/files/upload', fd);
       const url = res.data?.url || res.data?.data?.url || res.data?.path || res.data?.data?.path;
       if (!url) {
         console.error('[uploadFile] Response tidak mengandung URL:', res.data);

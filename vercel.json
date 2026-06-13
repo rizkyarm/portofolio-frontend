@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/v1/(.*)",
-      "destination": "https://bent-copyright-under-online.trycloudflare.com/api/v1/$1"
+      "destination": "https://api.rizkiaditiyar-backend.my.id/api/v1/$1"
     },
     {
       "source": "/((?!api).*)",
