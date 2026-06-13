@@ -400,6 +400,15 @@ export default function ProjectForm() {
     return e;
   };
 
+  // Helper: upload single file via /files/upload → return URL string
+  const uploadFile = async (file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await api.post('/files/upload', fd);
+    // Backend returns the URL path, e.g. "/uploads/abc123.webp"
+    return res.data?.url || res.data?.data?.url || res.data?.path || res.data?.data?.path || '';
+  };
+
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -413,35 +422,38 @@ export default function ProjectForm() {
     setLoading(true);
 
     try {
-      // Kirim sebagai FormData — backend menerima thumbnail + images[] langsung
-      const payload = new FormData();
-
-      // Text fields
-      Object.entries(form).forEach(([key, val]) => {
-        if (key === 'tags' || key === 'features' || key === 'tech_stack') {
-          payload.append(key, JSON.stringify(val));
-        } else if (key === 'is_featured') {
-          payload.append(key, val ? '1' : '0');
-        } else {
-          payload.append(key, val ?? '');
-        }
-      });
-
-      // Thumbnail
+      // Step 1: Upload thumbnail (jika ada file baru)
+      let thumbnailPath = undefined;
       if (thumbnail) {
-        payload.append('thumbnail', thumbnail);
+        thumbnailPath = await uploadFile(thumbnail);
       }
 
-      // Multiple images
-      if (images.length > 0) {
-        images.forEach((file, i) => {
-          payload.append(`images[${i}]`, file);
-        });
+      // Step 2: Upload additional images
+      const newImagePaths = [];
+      for (const file of images) {
+        const path = await uploadFile(file);
+        if (path) newImagePaths.push(path);
+      }
+      // Gabung: existing + new uploads
+      const allImagePaths = [...existingImgs, ...newImagePaths];
+
+      // Step 3: Kirim sebagai JSON — backend terima URL STRING, bukan File
+      const projectData = {
+        ...form,
+        tags:             form.tags,
+        features:         form.features,
+        tech_stack:       form.tech_stack,
+        is_featured:      form.is_featured ? 1 : 0,
+      };
+
+      // Thumbnail: kirim URL string (hanya kalau ada perubahan)
+      if (thumbnailPath !== undefined) {
+        projectData.thumbnail = thumbnailPath;
       }
 
-      // Existing images (edit mode)
-      if (existingImgs.length > 0) {
-        payload.append('existing_images', JSON.stringify(existingImgs));
+      // Images: kirim array of URL strings (hanya kalau ada data)
+      if (allImagePaths.length > 0) {
+        projectData.images = allImagePaths;
       }
 
       const url = isEdit
@@ -449,7 +461,7 @@ export default function ProjectForm() {
         : '/admin/projects';
 
       const method = isEdit ? api.put : api.post;
-      await method(url, payload);
+      await method(url, projectData); // ← JSON body, bukan FormData
 
       setToast({
         type: 'success',
