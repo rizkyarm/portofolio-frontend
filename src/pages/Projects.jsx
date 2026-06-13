@@ -4,6 +4,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import SEO from '../components/shared/SEO';
 import useApiCache from '../hooks/useApiCache';
 import { getFileUrl } from '../utils/media';
+import ImageCarousel from '../components/shared/ImageCarousel';
 
 const categoryColors = {
   website: 'from-indigo-500 to-green-600',
@@ -161,6 +162,12 @@ export default function Projects() {
 }
 
 function ProjectCard({ project, isDarkMode }) {
+  // Build all images: thumbnail first, then additional images
+  const allImages = [
+    getFileUrl(project.thumbnail),
+    ...(project.images || []).map(img => getFileUrl(typeof img === 'string' ? img : img.url)),
+  ].filter(Boolean);
+
   return (
     <Link to={`/projects/${project.slug}`}>
       <div className={`rounded-2xl border overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer h-full flex flex-col ${
@@ -168,20 +175,20 @@ function ProjectCard({ project, isDarkMode }) {
       }`}>
 
         
-        <div className={`h-48 bg-gradient-to-br ${categoryColors[project.category] || 'from-gray-400 to-gray-600'} flex items-center justify-center relative overflow-hidden`}>
-          {project.thumbnail ? (
-            <img
-              src={project.thumbnail}
+        <div className={`h-48 bg-gradient-to-br ${categoryColors[project.category] || 'from-gray-400 to-gray-600'} relative overflow-hidden`}>
+          {allImages.length > 0 ? (
+            <ImageCarousel
+              images={allImages}
               alt={project.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full"
             />
           ) : (
-            <span className="font-sora font-bold text-white text-3xl opacity-70">
+            <span className="font-sora font-bold text-white text-3xl opacity-70 absolute inset-0 flex items-center justify-center">
               {project.title.substring(0, 2).toUpperCase()}
             </span>
           )}
           {project.category === 'video' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors pointer-events-none">
               <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center">
                 <span className="text-2xl">▶</span>
               </div>

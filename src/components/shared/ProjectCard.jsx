@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, ExternalLink } from 'lucide-react';
 import Badge from '../ui/Badge';
-
-const API_URL = import.meta.env.VITE_API_URL || '';
+import ImageCarousel from './ImageCarousel';
+import { getFileUrl } from '../../utils/media';
 
 const categoryConfig = {
   website: { label: 'Website', color: 'primary' },
@@ -13,9 +13,12 @@ const categoryConfig = {
 };
 export default function ProjectCard({ project, index = 0 }) {
   const cat = categoryConfig[project.category] || categoryConfig.website;
-  const thumbnail = project.thumbnail
-    ? `${API_URL}/storage/${project.thumbnail}`
-    : null;
+
+  // Build all images: thumbnail first, then additional images
+  const allImages = [
+    getFileUrl(project.thumbnail),
+    ...(project.images || []).map(img => getFileUrl(typeof img === 'string' ? img : img.url)),
+  ].filter(Boolean); // Remove null/undefined
 
   return (
     <motion.div
@@ -34,12 +37,11 @@ export default function ProjectCard({ project, index = 0 }) {
       >
         
         <div className="relative aspect-[16/10] overflow-hidden bg-gray-900">
-          {thumbnail ? (
-            <img
-              src={thumbnail}
+          {allImages.length > 0 ? (
+            <ImageCarousel
+              images={allImages}
               alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              loading="lazy"
+              className="w-full h-full"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">

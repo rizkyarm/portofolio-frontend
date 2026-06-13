@@ -7,6 +7,7 @@ import {
   Eye, Loader,
 } from 'lucide-react';
 import api from '../../services/api';
+import { compressImage } from '../../utils/compress';
 
 const CATEGORIES = [
   { key: 'website', label: 'Website',     icon: Globe,       color: 'border-indigo-300 bg-indigo-50 text-indigo-700' },
@@ -187,14 +188,20 @@ function ImageUpload({ value, preview, onChange, label }) {
   const inputRef = useRef(null);
   const [drag, setDrag] = useState(false);
 
-  const handleFile = (file) => {
+  const handleFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Ukuran gambar maksimal 2MB');
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran gambar maksimal 5MB');
       return;
     }
-    const url = URL.createObjectURL(file);
-    onChange(file, url);
+    // Compress image before upload (keep good quality)
+    const compressed = await compressImage(file, {
+      maxWidth: 1200,
+      maxHeight: 1200,
+      quality: 0.85,
+    });
+    const url = URL.createObjectURL(compressed);
+    onChange(compressed, url);
   };
 
   const handleDrop = (e) => {
@@ -307,6 +314,9 @@ export default function ProjectForm() {
   const [form,        setForm]        = useState(INIT);
   const [thumbnail,   setThumbnail]   = useState(null);
   const [thumbPreview,setThumbPreview]= useState(null);
+  const [images,      setImages]      = useState([]);     
+  const [imgPreviews, setImgPreviews] = useState([]);     
+  const [existingImgs,setExistingImgs]= useState([]);     
   const [errors,      setErrors]      = useState({});
   const [loading,     setLoading]     = useState(false);
   const [fetching,    setFetching]    = useState(isEdit);
@@ -339,6 +349,7 @@ export default function ProjectForm() {
           order:             d.order             || 0,
         });
         if (d.thumbnail) setThumbPreview(d.thumbnail);
+        if (d.images?.length) setExistingImgs(d.images.map(img => typeof img === 'string' ? img : img.url));
       })
       .catch(() => {
         setToast({ type: 'error', message: 'Gagal memuat data project.' });
@@ -352,6 +363,33 @@ export default function ProjectForm() {
 
   const setE = (field) => (e) =>
     setForm(prev => ({ ...prev, [field]: e.target.value }));
+
+  
+  const addImage = async (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran gambar maksimal 5MB');
+      return;
+    }
+    // Compress image before adding
+    const compressed = await compressImage(file, {
+      maxWidth: 1200,
+      maxHeight: 1200,
+      quality: 0.85,
+    });
+    const url = URL.createObjectURL(compressed);
+    setImages(prev => [...prev, compressed]);
+    setImgPreviews(prev => [...prev, url]);
+  };
+
+  const removeImage = (index, isExisting = false) => {
+    if (isExisting) {
+      setExistingImgs(prev => prev.filter((_, i) => i !== index));
+    } else {
+      setImages(prev => prev.filter((_, i) => i !== index));
+      setImgPreviews(prev => prev.filter((_, i) => i !== index));
+    }
+  };
 
   
   const validate = () => {
@@ -391,6 +429,18 @@ export default function ProjectForm() {
       
       if (thumbnail) {
         payload.append('thumbnail', thumbnail);
+      }
+
+      
+      if (images.length > 0) {
+        images.forEach((file, i) => {
+          payload.append(`images[${i}]`, file);
+        });
+      }
+
+      
+      if (existingImgs.length > 0) {
+        payload.append('existing_images', JSON.stringify(existingImgs));
       }
 
       const url = isEdit
@@ -641,6 +691,89 @@ export default function ProjectForm() {
 
               
               <FormSection
+                title="Galeri Gambar"
+                desc="Upload beberapa gambar untuk memperkuat deskripsi project. Bisa di-swipe di halaman project."
+              >
+                {/* Existing images (edit mode) */}
+                {existingImgs.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                      Gambar tersimpan ({existingImgs.length})
+                    </p>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                      {existingImgs.map((src, i) => (
+                        <div key={i} className="relative group rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 aspect-square">
+                          <img src={src} alt={`Existing ${i + 1}`} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => removeImage(i, true)}
+                              className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* New image previews */}
+                {imgPreviews.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                      Gambar baru ({imgPreviews.length})
+                    </p>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                      {imgPreviews.map((src, i) => (
+                        <div key={i} className="relative group rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 aspect-square">
+                          <img src={src} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => removeImage(i)}
+                              className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Upload zone */}
+                <div
+                  onDragOver={(e) => { e.preventDefault(); }}
+                  onDrop={(e) => { e.preventDefault(); e.dataTransfer.files[0] && addImage(e.dataTransfer.files[0]); }}
+                  onClick={() => document.getElementById('multi-image-input')?.click()}
+                  className="w-full h-32 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all hover:border-brand-purple hover:bg-brand-pale/20 dark:hover:bg-brand-purple/5"
+                >
+                  <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center">
+                    <Image size={18} className="text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                      Upload Gambar Tambahan
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                      Drag & drop atau klik — PNG, JPG, WebP (max 2MB per gambar)
+                    </p>
+                  </div>
+                </div>
+                <input
+                  id="multi-image-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={e => e.target.files[0] && addImage(e.target.files[0])}
+                />
+              </FormSection>
+
+              
+              <FormSection
                 title="Link Project"
                 desc="URL demo dan repository source code"
               >
@@ -783,6 +916,7 @@ export default function ProjectForm() {
                     { label: 'Fitur',     val: form.features.length > 0 ? `${form.features.length} fitur` : '—' },
                     { label: 'Tech Stack',val: form.tech_stack.length > 0 ? `${form.tech_stack.length} teknologi` : '—' },
                     { label: 'Thumbnail', val: thumbPreview ? '✓ Siap' : 'Belum ada' },
+                    { label: 'Galeri',    val: imgPreviews.length + existingImgs.length > 0 ? `${imgPreviews.length + existingImgs.length} gambar` : '—' },
                   ].map(item => (
                     <div key={item.label} className="flex gap-2">
                       <span className="text-gray-400 dark:text-gray-500 min-w-[80px]">{item.label}</span>
