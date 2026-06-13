@@ -15,7 +15,7 @@ export async function compressImage(file, options = {}) {
   const {
     maxWidth = 1200,
     maxHeight = 1200,
-    quality = 0.85,
+    quality = 0.88,
   } = options;
 
   // Skip non-image files
@@ -50,8 +50,8 @@ export async function compressImage(file, options = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Use JPEG for maximum backend compatibility (WebP not always supported)
-      const mimeType = 'image/jpeg';
+      // WebP: kualitas tinggi + ukuran kecil (~70% lebih kecil dari PNG)
+      const mimeType = 'image/webp';
       canvas.toBlob(
         (blob) => {
           if (!blob) {
@@ -59,7 +59,7 @@ export async function compressImage(file, options = {}) {
             return;
           }
 
-          const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+          const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), {
             type: mimeType,
             lastModified: Date.now(),
           });
