@@ -405,11 +405,9 @@ export default function ProjectForm() {
     const fd = new FormData();
     fd.append('file', file);
     try {
-      // Pakai axios langsung — biarkan browser set Content-Type multipart otomatis
       const { default: axios } = await import('axios');
       const token = localStorage.getItem('admin_token');
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL || ''}/files/upload`,
+      const res = await axios.post('/api/v1/files/upload',
         fd,
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
