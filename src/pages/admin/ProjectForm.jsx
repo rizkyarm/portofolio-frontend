@@ -400,13 +400,31 @@ export default function ProjectForm() {
     return e;
   };
 
-  // Helper: upload single file via /files/upload → return URL string
+  
   const uploadFile = async (file) => {
     const fd = new FormData();
     fd.append('file', file);
-    const res = await api.post('/files/upload', fd);
-    // Backend returns the URL path, e.g. "/uploads/abc123.webp"
-    return res.data?.url || res.data?.data?.url || res.data?.path || res.data?.data?.path || '';
+    try {
+      const res = await api.post('/files/upload', fd);
+      const url = res.data?.url || res.data?.data?.url || res.data?.path || res.data?.data?.path;
+      if (!url) {
+        console.error('[uploadFile] Response tidak mengandung URL:', res.data);
+        throw new Error('Upload berhasil tapi URL tidak ditemukan di response');
+      }
+      return url;
+    } catch (err) {
+      
+      const detail = err.response?.data;
+      console.error('[uploadFile] Gagal upload:', {
+        status: err.response?.status,
+        message: detail?.message || err.message,
+        errors: detail?.errors,
+        fileName: file.name,
+        fileSize: `${(file.size / 1024).toFixed(1)}KB`,
+        fileType: file.type,
+      });
+      throw err;
+    }
   };
 
   
@@ -422,22 +440,20 @@ export default function ProjectForm() {
     setLoading(true);
 
     try {
-      // Step 1: Upload thumbnail (jika ada file baru)
       let thumbnailPath = undefined;
       if (thumbnail) {
         thumbnailPath = await uploadFile(thumbnail);
       }
 
-      // Step 2: Upload additional images
+
       const newImagePaths = [];
       for (const file of images) {
         const path = await uploadFile(file);
         if (path) newImagePaths.push(path);
       }
-      // Gabung: existing + new uploads
+  
       const allImagePaths = [...existingImgs, ...newImagePaths];
 
-      // Step 3: Kirim sebagai JSON — backend terima URL STRING, bukan File
       const projectData = {
         ...form,
         tags:             form.tags,
@@ -446,12 +462,10 @@ export default function ProjectForm() {
         is_featured:      form.is_featured ? 1 : 0,
       };
 
-      // Thumbnail: kirim URL string (hanya kalau ada perubahan)
       if (thumbnailPath !== undefined) {
         projectData.thumbnail = thumbnailPath;
       }
 
-      // Images: kirim array of URL strings (hanya kalau ada data)
       if (allImagePaths.length > 0) {
         projectData.images = allImagePaths;
       }
@@ -461,7 +475,7 @@ export default function ProjectForm() {
         : '/admin/projects';
 
       const method = isEdit ? api.put : api.post;
-      await method(url, projectData); // ← JSON body, bukan FormData
+      await method(url, projectData); // 
 
       setToast({
         type: 'success',
