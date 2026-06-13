@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/v1/(.*)",
-      "destination": "https://parameters-goto-recycling-bears.trycloudflare.com/api/v1/$1"
+      "destination": "https://caught-delaware-vocal-estates.trycloudflare.com/api/v1/$1"
     },
     {
       "source": "/((?!api).*)",
