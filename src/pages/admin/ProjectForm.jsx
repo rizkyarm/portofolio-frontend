@@ -400,14 +400,6 @@ export default function ProjectForm() {
     return e;
   };
 
-  // Helper: upload single file → return URL
-  const uploadFile = async (file) => {
-    const fd = new FormData();
-    fd.append('file', file);
-    const res = await api.post('/admin/upload', fd);
-    return res.data?.url || res.data?.data?.url || res.data?.path;
-  };
-
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -421,38 +413,35 @@ export default function ProjectForm() {
     setLoading(true);
 
     try {
-      // Step 1: Upload thumbnail (jika ada file baru)
-      let thumbnailUrl = undefined;
+      // Kirim sebagai FormData — backend menerima thumbnail + images[] langsung
+      const payload = new FormData();
+
+      // Text fields
+      Object.entries(form).forEach(([key, val]) => {
+        if (key === 'tags' || key === 'features' || key === 'tech_stack') {
+          payload.append(key, JSON.stringify(val));
+        } else if (key === 'is_featured') {
+          payload.append(key, val ? '1' : '0');
+        } else {
+          payload.append(key, val ?? '');
+        }
+      });
+
+      // Thumbnail
       if (thumbnail) {
-        thumbnailUrl = await uploadFile(thumbnail);
+        payload.append('thumbnail', thumbnail);
       }
 
-      // Step 2: Upload additional images
-      const uploadedUrls = [];
-      for (const file of images) {
-        const url = await uploadFile(file);
-        uploadedUrls.push(url);
-      }
-      // Gabung: existing + new uploads
-      const allImageUrls = [...existingImgs, ...uploadedUrls];
-
-      // Step 3: Kirim project data sebagai JSON
-      const projectData = {
-        ...form,
-        tags:             form.tags,
-        features:         form.features,
-        tech_stack:       form.tech_stack,
-        is_featured:      form.is_featured ? 1 : 0,
-      };
-
-      // Hanya sertakan thumbnail kalau ada file baru
-      if (thumbnailUrl !== undefined) {
-        projectData.thumbnail = thumbnailUrl;
+      // Multiple images
+      if (images.length > 0) {
+        images.forEach((file, i) => {
+          payload.append(`images[${i}]`, file);
+        });
       }
 
-      // Hanya sertakan images kalau ada data
-      if (allImageUrls.length > 0) {
-        projectData.images = allImageUrls;
+      // Existing images (edit mode)
+      if (existingImgs.length > 0) {
+        payload.append('existing_images', JSON.stringify(existingImgs));
       }
 
       const url = isEdit
@@ -460,7 +449,7 @@ export default function ProjectForm() {
         : '/admin/projects';
 
       const method = isEdit ? api.put : api.post;
-      await method(url, projectData);
+      await method(url, payload);
 
       setToast({
         type: 'success',
