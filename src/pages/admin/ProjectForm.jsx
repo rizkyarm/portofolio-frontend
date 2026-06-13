@@ -461,20 +461,27 @@ export default function ProjectForm() {
   
       const allImagePaths = [...existingImgs, ...newImagePaths];
 
-      const projectData = {
-        ...form,
-        tags:             form.tags,
-        features:         form.features,
-        tech_stack:       form.tech_stack,
-        is_featured:      form.is_featured ? 1 : 0,
-      };
+      // Kirim sebagai FormData — backend terima thumbnail & images sebagai URL string
+      const payload = new FormData();
 
+      Object.entries(form).forEach(([key, val]) => {
+        if (key === 'tags' || key === 'features' || key === 'tech_stack') {
+          payload.append(key, JSON.stringify(val));
+        } else if (key === 'is_featured') {
+          payload.append(key, val ? '1' : '0');
+        } else {
+          payload.append(key, val ?? '');
+        }
+      });
+
+      // Thumbnail: kirim URL string (bukan File)
       if (thumbnailPath !== undefined) {
-        projectData.thumbnail = thumbnailPath;
+        payload.append('thumbnail', thumbnailPath);
       }
 
+      // Images: kirim sebagai JSON array of URL strings
       if (allImagePaths.length > 0) {
-        projectData.images = allImagePaths;
+        payload.append('images', JSON.stringify(allImagePaths));
       }
 
       const url = isEdit
@@ -483,8 +490,12 @@ export default function ProjectForm() {
 
       const method = isEdit ? api.put : api.post;
       
-      console.log('[handleSubmit] Sending:', { url, data: projectData });
-      await method(url, projectData); 
+      // Debug: log all FormData entries
+      const debugData = {};
+      payload.forEach((v, k) => { debugData[k] = v instanceof File ? `[File: ${v.name}]` : v; });
+      console.log('[handleSubmit] Sending FormData:', { url, ...debugData });
+      
+      await method(url, payload); 
 
       setToast({
         type: 'success',
