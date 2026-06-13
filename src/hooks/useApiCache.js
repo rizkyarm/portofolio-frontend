@@ -5,15 +5,15 @@ const CACHE_PREFIX = 'pf_cache_';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const DEBOUNCE_MS = 400; // debounce API calls to avoid rate-limiting on HMR
 
-function getCache(key) {
+function getCache(key, ignoreExpiry = false) {
   try {
     const raw = localStorage.getItem(CACHE_PREFIX + key);
     if (!raw) return null;
     const entry = JSON.parse(raw);
     const now = Date.now();
-    // Check if cache expired (> 5 minutes)
-    if (now - entry.ts > CACHE_DURATION) {
-      localStorage.removeItem(CACHE_PREFIX + key);
+    // Only check expiry for normal use, not for error fallback
+    if (!ignoreExpiry && now - entry.ts > CACHE_DURATION) {
+      // Cache expired — but DON'T delete it, so it's available for error fallback
       return null;
     }
     return entry.data;
@@ -88,9 +88,10 @@ export default function useApiCache(endpoint, options = {}) {
 
       console.error(`[useApiCache] Error fetching ${endpoint}:`, err);
 
-      // Try to use cached data on error
-      const cached = getCache(endpoint);
+      // Try to use cached data on error — ignore expiry when backend is down
+      const cached = getCache(endpoint, true);  // ← true = pakai cache expired pun
       if (cached) {
+        console.warn(`[useApiCache] Using cached data for ${endpoint} (backend unreachable)`);
         setData(cached);
         setFromCache(true);
         setError(null);
