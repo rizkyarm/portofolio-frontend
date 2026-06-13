@@ -317,6 +317,7 @@ export default function ProjectForm() {
   const [images,      setImages]      = useState([]);     
   const [imgPreviews, setImgPreviews] = useState([]);     
   const [existingImgs,setExistingImgs]= useState([]);     
+  const [existingThumb,setExistingThumb]=useState(null); // existing thumbnail URL
   const [errors,      setErrors]      = useState({});
   const [loading,     setLoading]     = useState(false);
   const [fetching,    setFetching]    = useState(isEdit);
@@ -348,7 +349,10 @@ export default function ProjectForm() {
           is_featured:       d.is_featured       || false,
           order:             d.order             || 0,
         });
-        if (d.thumbnail) setThumbPreview(d.thumbnail);
+        if (d.thumbnail) {
+          setThumbPreview(d.thumbnail);
+          setExistingThumb(d.thumbnail);
+        }
         if (d.images?.length) setExistingImgs(d.images.map(img => typeof img === 'string' ? img : img.url));
       })
       .catch(() => {
@@ -474,14 +478,16 @@ export default function ProjectForm() {
         }
       });
 
-      // Thumbnail: kirim URL string (bukan File)
-      if (thumbnailPath !== undefined) {
-        payload.append('thumbnail', thumbnailPath);
+      // Thumbnail: kirim URL string (new upload, atau existing saat edit)
+      const finalThumb = thumbnailPath ?? existingThumb;
+      if (finalThumb) {
+        payload.append('thumbnail', finalThumb);
       }
 
-      // Images: kirim sebagai JSON array of URL strings
-      if (allImagePaths.length > 0) {
-        payload.append('images', JSON.stringify(allImagePaths));
+      // Images: kirim sebagai JSON array (new + existing, atau existing only)
+      const finalImages = allImagePaths.length > 0 ? allImagePaths : existingImgs;
+      if (finalImages.length > 0) {
+        payload.append('images', JSON.stringify(finalImages));
       }
 
       const url = isEdit
