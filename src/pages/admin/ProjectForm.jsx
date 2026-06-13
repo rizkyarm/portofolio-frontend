@@ -459,13 +459,15 @@ export default function ProjectForm() {
   
       const allImagePaths = [...existingImgs, ...newImagePaths];
 
-      // Kirim sebagai FormData untuk POST, JSON untuk PUT
+      const finalThumb   = thumbnailPath ?? existingThumb;
+      const finalImages  = allImagePaths.length > 0 ? allImagePaths : existingImgs;
+
       const url = isEdit
         ? `/admin/projects/${id}`
         : '/admin/projects';
 
       if (isEdit) {
-        // PUT — kirim sebagai JSON (Laravel PUT + multipart sering bermasalah)
+       
         const jsonPayload = { ...form };
         jsonPayload.tags       = form.tags;
         jsonPayload.features   = form.features;
@@ -478,7 +480,7 @@ export default function ProjectForm() {
         console.log('[handleSubmit] Sending JSON (PUT):', { url, ...jsonPayload });
         await api.put(url, jsonPayload);
       } else {
-        // POST — kirim sebagai FormData
+        
         const payload = new FormData();
 
         Object.entries(form).forEach(([key, val]) => {
