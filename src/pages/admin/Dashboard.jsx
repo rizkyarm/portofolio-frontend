@@ -87,7 +87,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/projects'),
+      api.get('/admin/projects'),
       api.get('/admin/messages'),
       api.get('/skills'),
       api.get('/services'),

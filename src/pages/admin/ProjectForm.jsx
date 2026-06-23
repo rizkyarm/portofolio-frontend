@@ -328,7 +328,7 @@ export default function ProjectForm() {
   useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
-    api.get(`/projects/${id}`)
+    api.get(`/admin/projects/${id}`)
       .then(res => {
         const d = res.data.data || res.data;
         setForm({

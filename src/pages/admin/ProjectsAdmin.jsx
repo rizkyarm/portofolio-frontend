@@ -201,11 +201,13 @@ export default function ProjectsAdmin() {
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const res  = await api.get('/projects');
-      const data = res.data.data || res.data || [];
+      const res  = await api.get('/admin/projects');
+      const raw  = res.data?.data ?? res.data ?? [];
+      const data = Array.isArray(raw) ? raw : [];
       setProjects(data);
-    } catch {
-      setProjects(dummyProjects);
+    } catch (err) {
+      console.error('[ProjectsAdmin] Gagal fetch projects:', err);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -611,5 +613,3 @@ export default function ProjectsAdmin() {
     </div>
   );
 }
-
-const dummyProjects = [];
