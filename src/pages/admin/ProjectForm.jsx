@@ -255,7 +255,7 @@ function ImageUpload({ value, preview, onChange, label }) {
           <div className="text-center">
             <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{label}</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              Drag & drop atau klik — PNG, JPG, WebP (max 2MB)
+              Drag & drop atau klik — PNG, JPG, WebP (max 5MB)
             </p>
           </div>
         </div>
@@ -481,7 +481,8 @@ export default function ProjectForm() {
       });
       console.log(`[handleSubmit] Sending multipart (${isEdit ? 'PUT' : 'POST'}):`, { url, ...debugData });
 
-      await method(url, payload);
+      // Timeout lebih panjang untuk upload file (120 detik)
+      await method(url, payload, { timeout: 120000 });
 
       setToast({
         type: 'success',
@@ -490,9 +491,14 @@ export default function ProjectForm() {
 
       setTimeout(() => navigate('/admin/projects'), 1500);
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Terjadi kesalahan. Coba lagi.';
+      // Prioritaskan friendlyMessage dari interceptor, lalu message dari backend
+      const msg =
+        err?.friendlyMessage ||
+        err?.response?.data?.message ||
+        'Terjadi kesalahan. Coba lagi.';
       console.error('[handleSubmit] Error:', {
         status: err?.response?.status,
+        code: err?.code,
         body: err?.response?.data,
       });
       setToast({ type: 'error', message: msg });
