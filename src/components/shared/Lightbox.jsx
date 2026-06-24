@@ -2,19 +2,15 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 /**
- * Fullscreen lightbox with swipe, keyboard nav, and zoom
- * @param {string[]} images - array of image URLs
- * @param {number} initialIndex - starting image index
- * @param {boolean} isOpen - whether lightbox is visible
- * @param {Function} onClose - close callback
+ * Fullscreen lightbox with swipe, keyboard nav, and zoom.
+ * Content is strictly constrained within the viewport — no overflow, no scroll leaks.
  */
 export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) {
   const [current, setCurrent] = useState(initialIndex);
   const [zoomed, setZoomed] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const dragStartX = useRef(0);
-  const dragOffset = useRef(0);
-  const imageRef = useRef(null);
+  const dragMoved = useRef(false);
+  const stageRef = useRef(null);
 
   const total = images?.length || 0;
   const hasMultiple = total > 1;
@@ -37,159 +33,174 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
     if (hasMultiple) goTo(current - 1);
   };
 
-  const close = () => {
+  const close = useCallback(() => {
     setZoomed(false);
     onClose();
-  };
+  }, [onClose]);
 
   // ── Keyboard ──
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       switch (e.key) {
-        case 'Escape':
-          close();
-          break;
-        case 'ArrowLeft':
-          prev(e);
-          break;
-        case 'ArrowRight':
-          next(e);
-          break;
-        case '+':
-        case '=':
-          setZoomed(true);
-          break;
-        case '-':
-          setZoomed(false);
-          break;
-        default:
-          break;
+        case 'Escape':  close(); break;
+        case 'ArrowLeft':  prev(e); break;
+        case 'ArrowRight': next(e); break;
+        default: break;
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, current, hasMultiple]);
+  }, [isOpen, current, hasMultiple, close]);
 
-  // ── Lock body scroll ──
+  // ── Lock body scroll & position ──
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
+    if (!isOpen) return;
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
+      window.scrollTo(0, scrollY);
+    };
   }, [isOpen]);
 
-  // ── Touch handlers ──
-  const onTouchStart = (e) => {
-    if (e.touches.length === 2) {
-      // pinch — toggle zoom
-      setZoomed((z) => !z);
-      return;
-    }
-    dragStartX.current = e.touches[0].clientX;
-    setIsDragging(true);
-  };
-  const onTouchMove = (e) => {
-    if (!isDragging) return;
-    dragOffset.current = dragStartX.current - e.touches[0].clientX;
-  };
-  const onTouchEnd = () => {
-    setIsDragging(false);
-    const diff = dragOffset.current;
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? goTo(current + 1) : goTo(current - 1);
-    }
-    dragOffset.current = 0;
-  };
-
-  // ── Mouse drag ──
-  const onMouseDown = (e) => {
-    if (e.button !== 0) return;
+  // ── Pointer-event-based drag (unified touch + mouse) ──
+  const onPointerDown = (e) => {
     dragStartX.current = e.clientX;
-    setIsDragging(true);
-    e.preventDefault();
-  };
-  const onMouseMove = (e) => {
-    if (!isDragging) return;
-    dragOffset.current = dragStartX.current - e.clientX;
-  };
-  const onMouseUp = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const diff = dragOffset.current;
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? goTo(current + 1) : goTo(current - 1);
-    }
-    dragOffset.current = 0;
+    dragMoved.current = false;
+    e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  // ── Double-click to zoom ──
-  const onDoubleClick = (e) => {
+  const onPointerMove = (e) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    if (Math.abs(dragStartX.current - e.clientX) > 5) {
+      dragMoved.current = true;
+    }
+  };
+
+  const onPointerUp = (e) => {
+    const el = e.currentTarget;
+    if (!el.hasPointerCapture(e.pointerId)) return;
+    el.releasePointerCapture(e.pointerId);
+
+    if (!dragMoved.current) return;
+    const dx = dragStartX.current - e.clientX;
+    if (Math.abs(dx) > 40) {
+      dx > 0 ? goTo(current + 1) : goTo(current - 1);
+    }
+  };
+
+  // Click the dark area around the image → close
+  const onStageClick = (e) => {
+    if (dragMoved.current) return;
+    if (e.target === stageRef.current) close();
+  };
+
+  // Double-click / double-tap image → toggle zoom
+  const onImageDoubleClick = (e) => {
     e.stopPropagation();
     setZoomed((z) => !z);
   };
 
-  // ── Click backdrop to close ──
-  const onBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      close();
-    }
-  };
-
   if (!isOpen || total === 0) return null;
+
+  const TOP_H = 52;       // top bar height
+  const BOTTOM_H = hasMultiple ? 44 : 0; // bottom dots height
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-fadeIn"
-      onClick={onBackdropClick}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
+      className="fixed inset-0 z-[100] overflow-hidden bg-black/95 backdrop-blur-sm"
+      style={{ animation: 'lbFadeIn 0.2s ease-out' }}
       role="dialog"
       aria-modal="true"
       aria-label="Image lightbox"
     >
-      {/* ── Top bar ── */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/60 to-transparent">
-        <div className="text-white/80 text-sm font-medium">
-          {current + 1} <span className="text-white/40">/</span> {total}
-        </div>
-        <div className="flex items-center gap-2">
+      {/* ═══════════════ Top bar ═══════════════ */}
+      <div
+        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4"
+        style={{
+          height: TOP_H,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.75), transparent)',
+        }}
+      >
+        <span className="text-white/80 text-sm font-medium select-none tabular-nums">
+          {current + 1}&nbsp;<span className="text-white/40">/</span>&nbsp;{total}
+        </span>
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => setZoomed((z) => !z)}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors active:scale-90"
             aria-label={zoomed ? 'Zoom out' : 'Zoom in'}
           >
-            {zoomed ? <ZoomOut size={16} /> : <ZoomIn size={16} />}
+            {zoomed ? <ZoomOut size={17} /> : <ZoomIn size={17} />}
           </button>
           <button
             onClick={close}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-colors active:scale-90"
             aria-label="Close lightbox"
           >
-            <X size={18} />
+            <X size={19} />
           </button>
         </div>
       </div>
 
-      {/* ── Navigation arrows ── */}
+      {/* ═══════════════ Image stage ═══════════════ */}
+      <div
+        ref={stageRef}
+        className="absolute z-10"
+        style={{
+          top: TOP_H,
+          bottom: BOTTOM_H,
+          left: 0,
+          right: 0,
+          overflow: zoomed ? 'auto' : 'hidden',
+          WebkitOverflowScrolling: 'touch',
+        }}
+        onClick={onStageClick}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+      >
+        {/* Centering flex wrapper */}
+        <div
+          className="flex items-center justify-center p-4 md:p-6"
+          style={zoomed ? { minHeight: '100%', minWidth: '100%' } : { height: '100%', width: '100%' }}
+        >
+          <img
+            src={images[current]}
+            alt={`Image ${current + 1} of ${total}`}
+            className={`select-none transition-transform duration-300 ease-out ${
+              zoomed
+                ? 'cursor-zoom-out scale-[2] origin-center'
+                : 'cursor-zoom-in max-w-full max-h-full object-contain'
+            }`}
+            onDoubleClick={onImageDoubleClick}
+            draggable={false}
+          />
+        </div>
+      </div>
+
+      {/* ═══════════════ Nav arrows ═══════════════ */}
       {hasMultiple && (
         <>
           <button
             onClick={prev}
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-sm transition-all active:scale-90"
+            className="absolute z-30 left-2 md:left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-sm transition-all active:scale-90"
             aria-label="Previous image"
           >
             <ChevronLeft size={22} />
           </button>
           <button
             onClick={next}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-sm transition-all active:scale-90"
+            className="absolute z-30 right-2 md:right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-sm transition-all active:scale-90"
             aria-label="Next image"
           >
             <ChevronRight size={22} />
@@ -197,31 +208,12 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
         </>
       )}
 
-      {/* ── Image ── */}
-      <div className="flex items-center justify-center w-full h-full p-4 md:p-8">
-        <img
-          ref={imageRef}
-          src={images[current]}
-          alt={`Image ${current + 1} of ${total}`}
-          className={`select-none transition-transform duration-300 ease-out ${
-            zoomed
-              ? 'cursor-zoom-out scale-150 max-w-none max-h-none'
-              : 'cursor-zoom-in max-w-full max-h-full object-contain'
-          }`}
-          onClick={onDoubleClick}
-          onDoubleClick={onDoubleClick}
-          draggable={false}
-          style={{
-            ...(zoomed && imageRef.current
-              ? { transformOrigin: 'center center' }
-              : {}),
-          }}
-        />
-      </div>
-
-      {/* ── Bottom dots (mobile-optimized) ── */}
+      {/* ═══════════════ Bottom dots ═══════════════ */}
       {hasMultiple && (
-        <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
+        <div
+          className="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-center gap-2"
+          style={{ height: BOTTOM_H }}
+        >
           {images.map((_, i) => (
             <button
               key={i}
@@ -237,14 +229,11 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
         </div>
       )}
 
-      {/* ── Inline styles for fadeIn animation ── */}
+      {/* ═══════════════ Inline keyframes ═══════════════ */}
       <style>{`
-        @keyframes fadeIn {
+        @keyframes lbFadeIn {
           from { opacity: 0; }
           to   { opacity: 1; }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
         }
       `}</style>
     </div>
