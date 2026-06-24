@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 /**
- * Fullscreen lightbox with swipe, keyboard nav, and zoom.
- * Content is strictly constrained within the viewport — no overflow, no scroll leaks.
+ * Fullscreen lightbox rendered via React Portal directly into <body>.
+ * This guarantees position:fixed always targets the viewport, regardless of
+ * parent transforms (e.g. Reveal animations, Framer Motion) in the React tree.
  */
 export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) {
   const [current, setCurrent] = useState(initialIndex);
@@ -54,25 +56,21 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
     return () => window.removeEventListener('keydown', handleKey);
   }, [isOpen, current, hasMultiple, close]);
 
-  // ── Lock body scroll & position ──
+  // ── Lock scroll on <html> (more reliable than body) ──
   useEffect(() => {
     if (!isOpen) return;
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
-
+    const html = document.documentElement;
+    const prevOverflow = html.style.overflow;
+    html.style.overflow = 'hidden';
+    // Also prevent pull-to-refresh on mobile
+    html.style.overscrollBehavior = 'none';
     return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, scrollY);
+      html.style.overflow = prevOverflow;
+      html.style.overscrollBehavior = '';
     };
   }, [isOpen]);
 
-  // ── Pointer-event-based drag (unified touch + mouse) ──
+  // ── Pointer-event drag (unified touch + mouse) ──
   const onPointerDown = (e) => {
     dragStartX.current = e.clientX;
     dragMoved.current = false;
@@ -90,7 +88,6 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
     const el = e.currentTarget;
     if (!el.hasPointerCapture(e.pointerId)) return;
     el.releasePointerCapture(e.pointerId);
-
     if (!dragMoved.current) return;
     const dx = dragStartX.current - e.clientX;
     if (Math.abs(dx) > 40) {
@@ -98,10 +95,9 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
     }
   };
 
-  // Click the dark area around the image → close
-  const onStageClick = (e) => {
-    if (dragMoved.current) return;
-    if (e.target === stageRef.current) close();
+  // Click the dark backdrop → close
+  const onBackdropClick = (e) => {
+    if (e.target === e.currentTarget) close();
   };
 
   // Double-click / double-tap image → toggle zoom
@@ -112,13 +108,20 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
 
   if (!isOpen || total === 0) return null;
 
-  const TOP_H = 52;       // top bar height
-  const BOTTOM_H = hasMultiple ? 44 : 0; // bottom dots height
+  const TOP_H = 52;
+  const BOTTOM_H = hasMultiple ? 44 : 0;
 
-  return (
+  const content = (
     <div
-      className="fixed inset-0 z-[100] overflow-hidden bg-black/95 backdrop-blur-sm"
-      style={{ animation: 'lbFadeIn 0.2s ease-out' }}
+      className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-sm"
+      style={{
+        width: '100vw',
+        height: '100vh',
+        height: '100dvh', // dynamic viewport height for mobile browsers
+        animation: 'lbFadeIn 0.2s ease-out',
+        overflow: 'hidden',
+      }}
+      onClick={onBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-label="Image lightbox"
@@ -163,13 +166,12 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
           right: 0,
           overflow: zoomed ? 'auto' : 'hidden',
           WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
         }}
-        onClick={onStageClick}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
       >
-        {/* Centering flex wrapper */}
         <div
           className="flex items-center justify-center p-4 md:p-6"
           style={zoomed ? { minHeight: '100%', minWidth: '100%' } : { height: '100%', width: '100%' }}
@@ -238,4 +240,6 @@ export default function Lightbox({ images, initialIndex = 0, isOpen, onClose }) 
       `}</style>
     </div>
   );
+
+  return createPortal(content, document.body);
 }
