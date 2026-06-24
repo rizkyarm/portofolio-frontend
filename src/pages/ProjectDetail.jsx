@@ -1,14 +1,17 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ExternalLink, Play,
   CheckCircle, ChevronRight, Monitor, Smartphone,
   Video, Palette, Calendar, Tag, Layers,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { useDarkMode } from '../context/DarkModeContext';
 import SEO from '../components/shared/SEO';
 import Reveal from '../components/animations/Reveal';
+import ImageCarousel from '../components/shared/ImageCarousel';
+import Lightbox from '../components/shared/Lightbox';
 import useApiCache from '../hooks/useApiCache';
 import { getFileUrl, transformProjectMedia } from '../utils/media';
 
@@ -106,13 +109,22 @@ export default function ProjectDetail() {
     },
   });
   const [activeTab, setActiveTab] = useState('overview');
-  const [lightbox, setLightbox] = useState(null);
+  const [lightbox, setLightbox] = useState(null); // { images: string[], index: number } | null
   const tabRef = useRef(null);
 
   const loading = detailLoading || listLoading;
   const otherProjects = project
     ? allProjects.filter(p => p.id !== project.id).slice(0, 3)
     : [];
+
+  // Build hero gallery: thumbnail first, then project images
+  const heroGallery = useMemo(() => {
+    if (!project) return [];
+    const gallery = [];
+    if (project.thumbnail) gallery.push(project.thumbnail);
+    if (project.images?.length) gallery.push(...project.images);
+    return gallery;
+  }, [project]);
 
   const scrollToTab = () => {
     tabRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -324,17 +336,27 @@ export default function ProjectDetail() {
               className="flex justify-center"
               style={{ animation: 'fadeUp 0.5s ease 0.2s forwards', opacity: 0 }}
             >
-              {project.thumbnail ? (
-                <div className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20">
-                  <img
-                    src={project.thumbnail}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
-                  />
+              {heroGallery.length > 0 ? (
+                <div className="w-full max-w-sm">
+                  <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 group/card">
+                    <ImageCarousel
+                      images={heroGallery}
+                      alt={project.title}
+                      className="aspect-[4/3]"
+                      alwaysShowArrows
+                      onImageClick={(idx) => setLightbox({ images: heroGallery, index: idx })}
+                    />
+                  </div>
+                  {heroGallery.length > 1 && (
+                    <p className="text-center text-white/50 text-xs mt-3 font-medium">
+                      <ImageIcon size={12} className="inline mr-1" />
+                      {heroGallery.length} gambar — klik atau swipe untuk navigasi
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="relative w-full max-w-sm">
-                  
+                  {/* Fallback placeholder */}
                   <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-3xl p-6 shadow-2xl">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-3 h-3 rounded-full bg-white/40" />
@@ -356,7 +378,6 @@ export default function ProjectDetail() {
                       <div className="h-3 bg-white/10 rounded w-3/4" />
                     </div>
                   </div>
-                  
                   <div className="absolute -bottom-3 -right-3 bg-white rounded-2xl px-4 py-2 shadow-xl">
                     <div className="text-xs font-bold text-gray-900">
                       {project.status === 'live' ? '🟢 Live' : '🟡 Draft'}
@@ -410,23 +431,43 @@ export default function ProjectDetail() {
               {images.length > 0 && (
                 <Reveal>
                   <div>
-                    <div className="text-xs font-semibold text-green-600 uppercase tracking-widest mb-4">
-                      Screenshots
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-xs font-semibold text-green-600 uppercase tracking-widest">
+                        Screenshots
+                      </div>
+                      <span className={`text-xs font-medium ${
+                        isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                      }`}>
+                        {images.length} gambar · klik untuk memperbesar
+                      </span>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                       {images.map((img, i) => (
                         <div
                           key={i}
-                          onClick={() => setLightbox(img)}
-                          className={`aspect-video rounded-2xl overflow-hidden cursor-pointer hover:scale-105 transition-transform border shadow-sm ${
-                            isDarkMode ? 'border-gray-700' : 'border-gray-100'
+                          onClick={() => setLightbox({ images, index: i })}
+                          className={`group/img relative aspect-video rounded-2xl overflow-hidden cursor-pointer border shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
+                            isDarkMode
+                              ? 'border-gray-700 hover:border-gray-500'
+                              : 'border-gray-100 hover:border-gray-300'
                           }`}
                         >
                           <img
                             src={img}
                             alt={`Screenshot ${i + 1}`}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-110"
+                            loading="lazy"
                           />
+                          {/* Overlay on hover */}
+                          <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-white/90 text-gray-900 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-all duration-300 scale-75 group-hover/img:scale-100 shadow-lg">
+                              <ImageIcon size={16} />
+                            </div>
+                          </div>
+                          {/* Index badge */}
+                          <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
+                            {i + 1}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -870,24 +911,12 @@ export default function ProjectDetail() {
       </section>
 
       
-      {lightbox && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setLightbox(null)}
-        >
-          <img
-            src={lightbox}
-            alt="Screenshot"
-            className="max-w-full max-h-full rounded-2xl shadow-2xl"
-          />
-          <button
-            onClick={() => setLightbox(null)}
-            className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors text-xl"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+      <Lightbox
+        images={lightbox?.images || []}
+        initialIndex={lightbox?.index || 0}
+        isOpen={!!lightbox}
+        onClose={() => setLightbox(null)}
+      />
 
     </div>
   );
