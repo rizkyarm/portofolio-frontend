@@ -50,6 +50,16 @@ export default function useApiCache(endpoint, options = {}) {
   const fetchData = useCallback(async () => {
     if (!mountedRef.current) return;
     
+    // Check cache first before hitting the API
+    const cached = getCache(endpoint, false);
+    if (cached) {
+      setData(cached);
+      setFromCache(true);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
