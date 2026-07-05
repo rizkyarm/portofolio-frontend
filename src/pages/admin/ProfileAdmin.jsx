@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fi';
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
+import { compressImage } from '../../utils/compress';
 
 function Toast({ toast, onClose }) {
   useEffect(() => {
@@ -35,12 +36,20 @@ function AvatarUpload({ preview, onChange, name }) {
   const ref = useRef(null);
   const initials = name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'AK';
 
-  const handleFile = (file) => {
+  const handleFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Ukuran gambar maksimal 2MB'); return;
+    
+    try {
+      const compressed = await compressImage(file, {
+        maxWidth: 300,
+        maxHeight: 300,
+        quality: 0.85,
+      });
+      onChange(compressed, URL.createObjectURL(compressed));
+    } catch {
+      // Fallback: kirim file asli jika kompresi gagal
+      onChange(file, URL.createObjectURL(file));
     }
-    onChange(file, URL.createObjectURL(file));
   };
 
   return (
