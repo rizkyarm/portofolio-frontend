@@ -8,6 +8,10 @@
       "destination": "https://rizkiaditiyar-backend.my.id/api/v1/$1"
     },
     {
+      "source": "/(.*\\.html$)",
+      "destination": "/$1"
+    },
+    {
       "source": "/((?!api).*)",
       "destination": "/index.html"
     }
