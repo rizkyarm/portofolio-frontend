@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkModeContext';
-import { Mail, MapPin, ArrowUpRight, Heart } from 'lucide-react';
+import { Mail, MapPin, ArrowUpRight } from 'lucide-react';
+import useApiCache from '../hooks/useApiCache';
+import { getFileUrl } from '../utils/media';
 
 const quickLinks = [
   { label: 'Home', path: '/' },
@@ -27,6 +29,18 @@ const socialLinks = [
 export default function Footer() {
   const year = new Date().getFullYear();
   const { isDarkMode } = useDarkMode();
+
+  const { data: profile = null } = useApiCache('/profile', {
+    transform: (res) => {
+      const raw = res.data?.data || res.data;
+      if (raw?.avatar) raw.avatar = getFileUrl(raw.avatar);
+      if (raw?.cv_url) raw.cv_url = getFileUrl(raw.cv_url);
+      return raw || null;
+    },
+    initialValue: null,
+  });
+
+  const emailText = profile?.email || 'Email belum diset';
 
   return (
     <footer
@@ -136,12 +150,15 @@ export default function Footer() {
             </h4>
             <div className="flex flex-col gap-3">
               <a
-                href="mailto:rizki@portfolio.com"
-                className="flex items-center gap-2.5 text-sm text-slate-400 hover:text-emerald-400 transition-colors group"
+                href={profile?.email ? `mailto:${profile.email}` : '#'}
+                className={`flex items-center gap-2.5 text-sm text-slate-400 hover:text-emerald-400 transition-colors group ${
+                  !profile?.email ? 'pointer-events-none' : ''
+                }`}
               >
                 <Mail size={14} className="flex-shrink-0 text-slate-500 group-hover:text-emerald-400 transition-colors" />
-                rizki@portfolio.com
+                {emailText}
               </a>
+              
               <div className="flex items-center gap-2.5 text-sm text-slate-400">
                 <MapPin size={14} className="flex-shrink-0 text-slate-500" />
                 Bandar Lampung, Indonesia
