@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, Download, ChevronDown, Code2, Smartphone, Video, Palette, WifiOff } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Download, Code2, Smartphone, Video, Palette, WifiOff } from 'lucide-react';
 import GradientMesh from '../components/animations/GradientMesh';
 import TextReveal from '../components/animations/TextReveal';
 import SectionHeader from '../components/shared/SectionHeader';
@@ -19,12 +19,6 @@ const categories = [
   { key: 'android', label: 'Android',      icon: Smartphone },
   { key: 'video',   label: 'Video',        icon: Video },
   { key: 'design',  label: 'Design',       icon: Palette },
-];
-
-const stats = [
-  { number: '24+', label: 'Projects Completed' },
-  { number: '3+',  label: 'Years Experience' },
-  { number: '18+', label: 'Happy Clients' },
 ];
 
 export default function Home() {
@@ -87,10 +81,10 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════
           HERO SECTION — Cinematic Full-Screen
           ═══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col px-6">
         <GradientMesh />
 
-        <div className="relative z-10 max-w-5xl mx-auto text-center">
+        <div className="relative z-10 max-w-5xl mx-auto text-center flex-1 flex flex-col justify-center">
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -122,9 +116,10 @@ export default function Home() {
             transition={{ delay: 1.2, duration: 0.6 }}
             className="max-w-xl mx-auto text-slate-400 text-lg md:text-xl mb-10 leading-relaxed"
           >
-            I build beautiful digital experiences that combine
-            <span className="text-emerald-400"> clean design</span> with
-            <span className="text-indigo-400"> powerful functionality</span>.
+            {profile?.bio
+              ? profile.bio
+              : "I build beautiful digital experiences that combine clean design with powerful functionality."
+            }
           </motion.p>
 
           {/* CTA Buttons */}
@@ -155,7 +150,11 @@ export default function Home() {
             transition={{ delay: 1.6, duration: 0.6 }}
             className="flex items-center justify-center gap-6 md:gap-12"
           >
-            {stats.map((stat, i) => (
+            {[
+              { number: `${profileStats.projects || 0}+`, label: 'Projects Completed' },
+              { number: `${profileStats.experience || 0}+`, label: 'Years Experience' },
+              { number: `${profileStats.clients || 0}+`, label: 'Happy Clients' },
+            ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="font-sora font-bold text-3xl md:text-4xl text-white mb-1">
                   {stat.number}
@@ -173,12 +172,20 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          className="relative z-10 flex flex-col items-center gap-2 pb-8"
         >
           <span className="text-[10px] text-slate-600 uppercase tracking-[0.2em]">Scroll</span>
-          <div className="w-5 h-8 rounded-full border border-slate-700 flex items-start justify-center p-1.5">
-            <div className="w-1 h-2 rounded-full bg-emerald-400 animate-scroll-indicator" />
-          </div>
+          <motion.div
+            className="w-5 h-8 rounded-full border border-slate-700 flex items-start justify-center p-1.5"
+            animate={{ y: [0, 4, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <motion.div
+              className="w-1 h-2 rounded-full bg-emerald-400"
+              animate={{ y: [0, 6, 0], opacity: [1, 0.3, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </motion.div>
         </motion.div>
       </section>
 

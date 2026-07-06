@@ -103,17 +103,6 @@ body {
   }
 }
 
-@keyframes scroll-indicator {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(8px);
-    opacity: 0;
-  }
-}
-
 @keyframes gradient-shift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -131,10 +120,6 @@ body {
 
 .animate-pulse-ring {
   animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-
-.animate-scroll-indicator {
-  animation: scroll-indicator 1.5s ease-in-out infinite;
 }
 
 .animate-gradient-shift {

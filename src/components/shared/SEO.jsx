@@ -18,7 +18,7 @@ export default function SEO({
   jsonLd = null,
 }) {
   const siteTitle = 'Rizki Aditiya Ramadan';
-  const fullTitle = title ? `${title} — ${siteTitle}` : siteTitle;
+  const fullTitle = title ? `${title} - ${siteTitle}` : siteTitle;
   const siteUrl = (import.meta.env.VITE_SITE_URL || 'https://rizkiaditiyar.vercel.app').replace(/\/+$/, '');
   const canonicalUrl = `${siteUrl}${path}`;
   const ogImage = image || `${siteUrl}/og-image.png`;
