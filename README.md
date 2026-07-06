@@ -1,6 +1,6 @@
 # Portfolio Frontend — Rizki Aditiya Ramadan
 
-Personal portfolio website built with **React 19**, **Vite**, **Tailwind CSS**, and **Framer Motion**. Features a public-facing portfolio with project showcase and a full admin dashboard.
+Personal portfolio website built with **React 19**, **Vite**, **Tailwind CSS**, and **Framer Motion**. Features a public-facing portfolio with project showcase, interactive image gallery, and a full admin dashboard.
 
 ## Tech Stack
 
@@ -25,7 +25,7 @@ npm install
 # Start development server
 npm run dev
 
-# Build for production
+# Build for production (includes sitemap generation)
 npm run build
 
 # Preview production build
@@ -51,9 +51,11 @@ src/
 │   ├── layout/
 │   │   └── ScrollProgress.jsx
 │   ├── shared/
+│   │   ├── ImageCarousel.jsx # Swipeable image gallery with drag & keyboard support
+│   │   ├── Lightbox.jsx      # Fullscreen image viewer (React Portal)
 │   │   ├── ProjectCard.jsx
 │   │   ├── SectionHeader.jsx
-│   │   └── SEO.jsx
+│   │   └── SEO.jsx           # Meta tags, OG, Twitter Cards, JSON-LD
 │   └── ui/
 │       ├── Badge.jsx
 │       └── Button.jsx
@@ -61,6 +63,7 @@ src/
 │   ├── AuthContext.jsx       # Authentication state
 │   └── DarkModeContext.jsx   # Dark/light mode state
 ├── hooks/
+│   ├── useApiCache.js        # API cache with localStorage, debounce, error fallback
 │   ├── useDarkMode.js
 │   └── useReveal.js          # Intersection Observer hook
 ├── layouts/
@@ -70,7 +73,7 @@ src/
 │   ├── Home.jsx
 │   ├── About.jsx
 │   ├── Projects.jsx
-│   ├── ProjectDetail.jsx
+│   ├── ProjectDetail.jsx     # Image gallery + lightbox integration
 │   ├── Services.jsx
 │   ├── Contact.jsx
 │   ├── NotFound.jsx          # 404 page
@@ -78,25 +81,17 @@ src/
 │       ├── Login.jsx
 │       ├── Dashboard.jsx
 │       ├── ProjectsAdmin.jsx
-│       ├── ProjectForm.jsx
+│       ├── ProjectForm.jsx   # Image compression on upload
 │       ├── SkillsAdmin.jsx
 │       ├── ServicesAdmin.jsx
 │       ├── MessagesAdmin.jsx
-│       └── ProfileAdmin.jsx
+│       └── ProfileAdmin.jsx  # Avatar compression on upload
 ├── routes/
 │   ├── AppRouter.jsx         # All route definitions
 │   └── PrivateRoute.jsx      # Auth guard for admin routes
 └── services/
     ├── api.js                # Axios instance with interceptors
     └── skillServices.js
-```
-
-## Environment Variables
-
-Create a `.env` file at the project root:
-
-```env
-VITE_API_URL=http://localhost:3000/api/v1
 ```
 
 ## Routes
@@ -120,23 +115,73 @@ VITE_API_URL=http://localhost:3000/api/v1
 | `/admin/messages` | Messages | Authenticated |
 | `/admin/profile` | Profile | Authenticated |
 
-## Features
+## Key Features
 
-- **Dark/Light Mode** — Toggle with persistent preference
-- **Responsive Design** — Mobile-first with bottom tab navigation on mobile, full top nav on desktop
-- **Page Transitions** — Smooth animations between routes
-- **SEO Optimized** — Meta tags, Open Graph, Twitter Cards via React Helmet
-- **Admin Dashboard** — Full CRUD for projects, skills, services, and messages
-- **JWT Authentication** — Token-based auth with auto-refresh and 401 handling
-- **404 Page** — Custom not-found page with themed design
-| *(Layout Wrappers)* | `AdminLayout.jsx` | Admin dashboard layout |
-| **🎛️ CONTEXT** | `AuthContext.jsx` | Authentication state |
-| *(State Management)* | `DarkModeContext.jsx`| Dark mode toggle state |
-| **🪝 HOOKS** | `useDarkMode.js` | Hook to access dark mode context |
-| **🔌 SERVICES** | `api.js` | Axios instance & API endpoints |
-| *(API Config)* | `skillServices.js` | Skill-specific API calls |
-| **🎨 ASSETS** | `hero.png` | Hero image |
-| *(Static Files)* | `react.svg` | React logo |
-| | `vite.svg` | Vite logo |
-| **📂 PUBLIC** | `-` | Static files for direct public access |
-| **📂 NODE_MODULES**| `-` | Project dependencies |
+### 🖼️ Interactive Image Gallery
+- **Swipeable carousel** with touch and mouse drag support (Pointer Events API)
+- **Keyboard navigation** — arrow keys to navigate, Escape to close lightbox
+- **Fullscreen lightbox** rendered via React Portal (escapes CSS `transform` containing-block issues)
+- Unified drag/swipe across desktop and mobile
+
+### 🚀 Performance & Caching
+- **Cache-first API strategy** — returns cached data immediately, only fetches when cache is expired
+- **Debounced requests** (400ms) — prevents burst requests on mount or HMR reload
+- **Stale cache fallback** — when backend is unreachable, uses expired cache as fallback
+- **Image compression** on upload — avatars and project images are resized and compressed to JPEG at 85% quality
+
+### 🔍 SEO Optimization
+- **Dynamic sitemap** generated at build time — includes all static pages and project detail URLs from the API
+- **JSON-LD structured data** — Person, WebSite, WebPage, and CreativeWork schemas for rich search results
+- **Open Graph & Twitter Cards** — configured for social sharing previews across all pages
+- **OG image** — 1200×630px preview image for link sharing
+- **Canonical URLs** — each page has a proper canonical link to avoid duplicate content
+- **Semantic HTML** — `lang="id"` for Indonesian content, `meta robots` tag
+
+### 🔐 Admin Dashboard
+- Protected routes with auth guard
+- Token-based authentication via Axios interceptors (auto-attach, 401 handling)
+- Full CRUD for projects, skills, services, messages, and profile
+- Form validation with friendly error messages
+
+### 🎨 UI/UX
+- **Dark/Light mode** — toggle with persistent preference
+- **Responsive design** — mobile-first, bottom tab navigation on mobile, full top nav on desktop
+- **Page transitions** — smooth Framer Motion animations between routes
+- **Scroll reveal** — intersection observer-based animations
+- **Custom 404 page** — themed not-found page with floating numbers
+
+## Environment Variables
+
+Create a `.env` file at the project root:
+
+```env
+VITE_API_URL=/api/v1
+VITE_SITE_URL=https://yourdomain.vercel.app
+```
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_API_URL` | Backend API base URL | `/api/v1` |
+| `VITE_SITE_URL` | Site URL for canonical & OG tags | `https://rizkiaditiyar.vercel.app` |
+
+## Deployment
+
+### Vercel
+
+The project includes a `vercel.json` with:
+- API proxy rewrites to the backend
+- SPA fallback for client-side routing
+- Static file serving for verification files
+
+Environment variables must be set in **Vercel Project Settings → Environment Variables**.
+
+### Build Process
+
+```bash
+npm run build
+```
+
+The build script:
+1. Generates `public/sitemap.xml` with all static + dynamic project URLs
+2. Runs Vite production build
+3. Outputs everything to `dist/`
