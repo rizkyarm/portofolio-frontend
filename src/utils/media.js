@@ -56,5 +56,16 @@ export function transformProjectMedia(project) {
     images: (project.images || []).map(img => 
       typeof img === 'string' ? getFileUrl(img) : { ...img, url: getFileUrl(img.url) }
     ),
+    demo_url: ensureUrl(project.demo_url),
+    repo_url: ensureUrl(project.repo_url),
   };
+}
+
+/**
+ * Ensure a URL has a protocol prefix
+ */
+export function ensureUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `https://${url}`;
 }

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 import { useDarkMode } from '../../context/DarkModeContext';
+import { ensureUrl } from '../../utils/media';
 
 const CATEGORIES = [
   { key: 'all',     label: 'Semua' },
@@ -147,7 +148,7 @@ function RowActions({ project, onDelete, isDarkMode }) {
           {project.demo_url && (
             
             <a
-              href={project.demo_url}
+              href={ensureUrl(project.demo_url)}
               target="_blank"
               rel="noreferrer"
               className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-50'}`}
