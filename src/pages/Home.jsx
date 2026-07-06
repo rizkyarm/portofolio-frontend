@@ -68,7 +68,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white overflow-hidden">
       <SEO
-        title="Home"
+        title="Portfolio"
         description="Portfolio of Rizki Aditiya Ramadan — Creative Developer & Digital Creator specializing in Web Development, Android Apps, Video Production, and UI/UX Design."
         path="/"
       />

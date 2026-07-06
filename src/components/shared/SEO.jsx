@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet-async';
  * @param {string} [props.path] 
  * @param {string} [props.image]
  * @param {string} [props.type]
+ * @param {Object} [props.jsonLd]
  */
 export default function SEO({
   title,
@@ -14,12 +15,51 @@ export default function SEO({
   path = '',
   image = null,
   type = 'website',
+  jsonLd = null,
 }) {
   const siteTitle = 'Rizki Aditiya Ramadan';
   const fullTitle = title ? `${title} — ${siteTitle}` : siteTitle;
-  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://portofolio-sigma-three-11.vercel.app';
+  const siteUrl = (import.meta.env.VITE_SITE_URL || 'https://rizkiaditiyar.vercel.app').replace(/\/+$/, '');
   const canonicalUrl = `${siteUrl}${path}`;
   const ogImage = image || `${siteUrl}/og-image.png`;
+
+  // ── JSON-LD: default Person + WebSite ──
+  const defaultJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': `${siteUrl}/#person`,
+        name: 'Rizki Aditiya Ramadan',
+        url: siteUrl,
+        jobTitle: 'Creative Developer',
+        description: description,
+        sameAs: [
+          'https://github.com/rizkiaditiyar',
+          'https://linkedin.com/in/rizkiaditiyar',
+        ],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${siteUrl}/#website`,
+        url: siteUrl,
+        name: siteTitle,
+        description: description,
+        publisher: { '@id': `${siteUrl}/#person` },
+      },
+      {
+        '@type': 'WebPage',
+        '@id': canonicalUrl,
+        url: canonicalUrl,
+        name: fullTitle,
+        description: description,
+        isPartOf: { '@id': `${siteUrl}/#website` },
+        about: { '@id': `${siteUrl}/#person` },
+      },
+    ],
+  };
+
+  const ld = jsonLd || defaultJsonLd;
 
   return (
     <Helmet>
@@ -41,6 +81,8 @@ export default function SEO({
 
       <meta name="robots" content="index, follow" />
       <meta name="author" content={siteTitle} />
+
+      <script type="application/ld+json">{JSON.stringify(ld)}</script>
     </Helmet>
   );
 }

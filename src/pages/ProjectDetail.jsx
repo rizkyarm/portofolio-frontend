@@ -109,7 +109,7 @@ export default function ProjectDetail() {
     },
   });
   const [activeTab, setActiveTab] = useState('overview');
-  const [lightbox, setLightbox] = useState(null); // { images: string[], index: number } | null
+  const [lightbox, setLightbox] = useState(null); 
   const tabRef = useRef(null);
 
   const loading = detailLoading || listLoading;
@@ -170,6 +170,20 @@ export default function ProjectDetail() {
         description={project.short_description || project.description?.substring(0, 160)}
         path={`/projects/${project.slug}`}
         type="article"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CreativeWork',
+          name: project.title,
+          description: project.short_description || project.description?.substring(0, 160),
+          url: `${import.meta.env.VITE_SITE_URL || 'https://rizkiaditiyar.vercel.app'}/projects/${project.slug}`,
+          image: project.thumbnail || undefined,
+          keywords: (project.tags || []).join(', '),
+          dateCreated: project.created_at || undefined,
+          about: {
+            '@type': 'Person',
+            name: 'Rizki Aditiya Ramadan',
+          },
+        }}
       />
 
       
@@ -228,7 +242,7 @@ export default function ProjectDetail() {
               )}
               {project.repo_url && (
                 <a
-                  href={project.repo_url}
+                  href={repo_url}
                   target="_blank"
                   rel="noreferrer"
                   className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition-colors border border-white/20"
@@ -464,7 +478,6 @@ export default function ProjectDetail() {
                               <ImageIcon size={16} />
                             </div>
                           </div>
-                          {/* Index badge */}
                           <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
                             {i + 1}
                           </div>
