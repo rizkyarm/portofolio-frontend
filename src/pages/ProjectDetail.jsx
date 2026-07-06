@@ -242,7 +242,7 @@ export default function ProjectDetail() {
               )}
               {project.repo_url && (
                 <a
-                  href={repo_url}
+                  href={project.repo_url}
                   target="_blank"
                   rel="noreferrer"
                   className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition-colors border border-white/20"
