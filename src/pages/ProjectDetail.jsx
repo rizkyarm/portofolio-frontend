@@ -641,8 +641,12 @@ export default function ProjectDetail() {
 
               
               <Reveal delay={200}>
-                <div className={isDarkMode ? 'bg-gray-800 rounded-3xl p-5' : 'bg-brand-navy rounded-3xl p-5'}>
-                  <div className="text-white font-sora font-bold mb-2">
+                <div className={`rounded-3xl p-5 shadow-sm border ${
+                  isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
+                  }`}>
+                  <div className={`text-xs font-semibold uppercase tracking-widest mb-4 ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-400'
+                  }`}>
                     Tertarik dengan project ini?
                   </div>
                   <p className={`text-xs leading-relaxed mb-4 ${

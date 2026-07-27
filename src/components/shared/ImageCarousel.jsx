@@ -1,13 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-/**
- * Horizontal swipeable image carousel with mouse drag support
+/*
  * @param {string[]} images - array of image URLs
  * @param {string} alt - alt text for images
- * @param {string} [className] - additional classes for the container
- * @param {boolean} [alwaysShowArrows] - force arrows visible on all devices
- * @param {Function} [onImageClick] - callback when an image is clicked (receives index)
+ * @param {string} [className]
+ * @param {boolean} [alwaysShowArrows] 
+ * @param {Function} [onImageClick]
  */
 export default function ImageCarousel({
   images,
@@ -183,7 +182,6 @@ export default function ImageCarousel({
         </div>
       )}
 
-      {/* Swipe hint for mobile — fades after first interaction */}
       {hasMultiple && (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/60 text-[10px] font-medium tracking-wide md:hidden animate-pulse">
           ← swipe →
