@@ -51,7 +51,6 @@ const defaultContactInfo = [
   },
 ];
 
-// Transform backend profile data to contactInfo structure
 function mapProfileToContactInfo(profile) {
   if (!profile) return defaultContactInfo;
 
@@ -254,7 +253,6 @@ export default function Contact() {
     setStatus('loading');
     
     try {
-      // Send message to backend
       const response = await api.post('/messages', {
         name: form.name.trim(),
         email: form.email.trim(),
@@ -262,10 +260,8 @@ export default function Contact() {
         body: form.body.trim(),
       });
 
-      // Check if response is successful
       if (response.status === 200 || response.status === 201) {
         setStatus('success');
-        // Reset form after successful submission
         setForm({ 
           name: '', 
           email: '', 
@@ -274,16 +270,13 @@ export default function Contact() {
           budget: '', 
           body: '' 
         });
-        // Auto reset success message after 5 seconds
         setTimeout(() => setStatus('idle'), 5000);
       }
     } catch (error) {
       console.error('[Contact] Error submitting form:', error);
       setStatus('error');
       
-      // Provide specific error feedback
       if (error.response?.status === 422) {
-        // Validation error from backend
         const backendErrors = error.response.data?.errors || {};
         setErrors(backendErrors);
       } else if (error.response?.status >= 500) {
@@ -407,7 +400,7 @@ export default function Contact() {
             </div>
 
             <Reveal delay={250}>
-              <div className="bg-slate-900 rounded-2xl p-5 flex items-center gap-4 shadow-xl shadow-slate-900/10 border border-slate-800">
+              <div className={`flex items-center gap-5 p-4 sm:p-5 rounded-2xl border shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
                 <div className="relative flex-shrink-0">
                   <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center font-bold text-white text-lg shadow-inner">
                     {profile?.name ? profile.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'RR'}
@@ -415,7 +408,7 @@ export default function Contact() {
                   <div className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-400 rounded-full border-2 border-slate-900 animate-pulse" />
                 </div>
                 <div>
-                  <div className="text-white font-bold text-base">
+                  <div className={`text-sm font-semibold ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>
                     {profile?.name || 'Rizki Aditiya Ramadan'}
                   </div>
                   <div className="text-emerald-400 text-xs font-semibold mt-1 flex items-center gap-1.5">

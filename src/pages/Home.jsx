@@ -60,7 +60,7 @@ export default function Home() {
   const profileStats = profile?.stats || {};
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white overflow-hidden">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden">
       <SEO
         title="Portfolio"
         description="Portfolio of Rizki Aditiya Ramadan — Creative Developer & Digital Creator specializing in Web Development, Android Apps, Video Production, and UI/UX Design."
@@ -114,7 +114,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.6 }}
-            className="max-w-xl mx-auto text-slate-400 text-lg md:text-xl mb-10 leading-relaxed"
+            className="max-w-xl mx-auto text-[var(--color-muted)] text-lg md:text-xl mb-10 leading-relaxed"
           >
             {profile?.bio
               ? profile.bio
@@ -156,10 +156,10 @@ export default function Home() {
               { number: `${profileStats.clients || 0}+`, label: 'Happy Clients' },
             ].map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="font-sora font-bold text-3xl md:text-4xl text-white mb-1">
+                <div className="font-sora font-bold text-3xl md:text-4xl text-[var(--color-text)] mb-1">
                   {stat.number}
                 </div>
-                <div className="text-xs md:text-sm text-slate-500 uppercase tracking-wider">
+                <div className="text-xs md:text-sm text-[var(--color-muted)] uppercase tracking-wider">
                   {stat.label}
                 </div>
               </div>
@@ -174,9 +174,9 @@ export default function Home() {
           transition={{ delay: 2 }}
           className="relative z-10 flex flex-col items-center gap-2 pb-8"
         >
-          <span className="text-[10px] text-slate-600 uppercase tracking-[0.2em]">Scroll</span>
+          <span className="text-[10px] text-[var(--color-muted)] uppercase tracking-[0.2em]">Scroll</span>
           <motion.div
-            className="w-5 h-8 rounded-full border border-slate-700 flex items-start justify-center p-1.5"
+            className="w-5 h-8 rounded-full border border-[var(--color-border)] flex items-start justify-center p-1.5"
             animate={{ y: [0, 4, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -214,7 +214,7 @@ export default function Home() {
                     transition-all duration-300 cursor-pointer
                     ${activeCategory === cat.key
                       ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-lg shadow-emerald-500/10'
-                      : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10 hover:text-white'
+                      : 'bg-black/5 dark:bg-white/5 text-[var(--color-muted)] border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 hover:text-[var(--color-text)]'
                     }
                   `}
                 >
@@ -229,7 +229,7 @@ export default function Home() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-2xl bg-white/5 animate-pulse aspect-[16/14]" />
+                <div key={i} className="rounded-2xl bg-black/5 dark:bg-white/5 animate-pulse aspect-[16/14]" />
               ))}
             </div>
           ) : featuredProjects.length > 0 ? (
@@ -240,7 +240,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-slate-500 text-lg">No projects found in this category.</p>
+              <p className="text-[var(--color-muted)] text-lg">No projects found in this category.</p>
             </div>
           )}
 
@@ -263,7 +263,7 @@ export default function Home() {
           SKILLS SECTION
           ═══════════════════════════════════════════════ */}
       {skills.length > 0 && (
-        <section className="relative py-24 px-6 border-t border-white/5">
+        <section className="relative py-24 px-6 border-t border-[var(--color-border)]">
           <div className="max-w-6xl mx-auto">
             <Reveal>
               <SectionHeader
@@ -276,17 +276,17 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {skills.map((skill, i) => (
                 <Reveal key={skill.id} delay={i * 50}>
-                  <div className="group relative p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all duration-300 text-center card-hover">
+                  <div className="group relative p-5 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border border-[var(--color-border)] dark:border-white/5 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all duration-300 text-center card-hover">
                     {skill.icon && (
                       <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">
                         {skill.icon}
                       </div>
                     )}
-                    <h4 className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">
+                    <h4 className="text-sm font-medium text-[var(--color-muted)] group-hover:text-[var(--color-text)] transition-colors">
                       {skill.name}
                     </h4>
                     
-                    <div className="mt-3 h-1 rounded-full bg-white/10 overflow-hidden">
+                    <div className="mt-3 h-1 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-indigo-500 transition-all duration-1000"
                         style={{ width: `${skill.level || 80}%` }}
@@ -304,7 +304,7 @@ export default function Home() {
           SERVICES SECTION
           ═══════════════════════════════════════════════ */}
       {services.length > 0 && (
-        <section className="relative py-24 px-6 border-t border-white/5">
+        <section className="relative py-24 px-6 border-t border-[var(--color-border)]">
           <div className="max-w-6xl mx-auto">
             <Reveal>
               <SectionHeader
@@ -317,7 +317,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {services.map((service, i) => (
                 <Reveal key={service.id} delay={i * 100}>
-                  <div className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-all duration-500 card-hover overflow-hidden">
+                  <div className="group relative p-8 rounded-2xl bg-white dark:bg-white/[0.02] border border-[var(--color-border)] dark:border-white/5 hover:border-emerald-500/20 transition-all duration-500 card-hover overflow-hidden">
                     
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -328,18 +328,18 @@ export default function Home() {
                         </div>
                       )}
 
-                      <h3 className="font-sora font-bold text-xl text-white mb-3 group-hover:text-emerald-400 transition-colors">
+                      <h3 className="font-sora font-bold text-xl text-[var(--color-text)] mb-3 group-hover:text-emerald-400 transition-colors">
                         {service.title}
                       </h3>
 
-                      <p className="text-slate-400 text-sm leading-relaxed mb-5">
+                      <p className="text-[var(--color-muted)] text-sm leading-relaxed mb-5">
                         {service.description}
                       </p>
 
                       {service.includes && service.includes.length > 0 && (
                         <ul className="space-y-2">
                           {service.includes.slice(0, 4).map((item, j) => (
-                            <li key={j} className="flex items-center gap-2 text-xs text-slate-500">
+                            <li key={j} className="flex items-center gap-2 text-xs text-[var(--color-muted)]">
                               <span className="w-1 h-1 rounded-full bg-emerald-400 flex-shrink-0" />
                               {item}
                             </li>
@@ -348,8 +348,8 @@ export default function Home() {
                       )}
 
                       {service.price_range && (
-                        <div className="mt-5 pt-5 border-t border-white/5">
-                          <span className="text-xs text-slate-500">Starting from</span>
+                        <div className="mt-5 pt-5 border-t border-[var(--color-border)]">
+                          <span className="text-xs text-[var(--color-muted)]">Starting from</span>
                           <p className="font-sora font-bold text-emerald-400">{service.price_range}</p>
                         </div>
                       )}
@@ -365,16 +365,16 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════
           CTA SECTION
           ═══════════════════════════════════════════════ */}
-      <section className="relative py-24 px-6 border-t border-white/5">
+      <section className="relative py-24 px-6 border-t border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto text-center">
           <Reveal>
-            <h2 className="font-sora font-bold text-3xl md:text-5xl text-white mb-6">
+            <h2 className="font-sora font-bold text-3xl md:text-5xl text-[var(--color-text)] mb-6">
               Let's Build Something
               <span className="text-gradient-emerald"> Amazing Together</span>
             </h2>
           </Reveal>
           <Reveal delay={100}>
-            <p className="text-slate-400 text-lg mb-10 max-w-lg mx-auto">
+            <p className="text-[var(--color-muted)] text-lg mb-10 max-w-lg mx-auto">
               Have a project in mind? I'd love to hear about it. Let's discuss how we can work together.
             </p>
           </Reveal>
