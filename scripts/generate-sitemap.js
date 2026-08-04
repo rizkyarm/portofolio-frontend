@@ -10,15 +10,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // config
 const SITE_URL = process.env.VITE_SITE_URL || 'https://rizkiaditiyar.vercel.app';
-const API_URL  = process.env.VITE_API_URL  || 'https://rizkiaditiyar-backend.my.id/api/v1';
+// Sitemap fetch harus pakai URL absolut (bukan VITE_API_URL yang bisa relatif saat prerender)
+const API_URL  = process.env.SITEMAP_API_URL || 'https://rizkiaditiyar-backend.my.id/api/v1';
 const OUTPUT   = path.resolve(__dirname, '..', 'public', 'sitemap.xml');
 
 const staticPages = [
-  { loc: '/',          priority: 1.0 },
-  { loc: '/about',     priority: 0.8 },
-  { loc: '/projects',  priority: 0.9 },
-  { loc: '/services',  priority: 0.8 },
-  { loc: '/contact',   priority: 0.7 },
+  { loc: '/',          priority: 1.0, changefreq: 'weekly'  },
+  { loc: '/about',     priority: 0.8, changefreq: 'monthly' },
+  { loc: '/projects',  priority: 0.9, changefreq: 'weekly'  },
+  { loc: '/services',  priority: 0.8, changefreq: 'monthly' },
+  { loc: '/contact',   priority: 0.7, changefreq: 'yearly'  },
 ];
 
 async function fetchProjects() {
@@ -38,6 +39,7 @@ function buildXml(pages) {
   const urls = pages.map(p => `  <url>
     <loc>${SITE_URL}${p.loc}</loc>
     <lastmod>${p.lastmod || new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>${p.changefreq || 'monthly'}</changefreq>
     <priority>${p.priority}</priority>
   </url>`);
 
@@ -55,6 +57,7 @@ async function main() {
     ...projects.map(p => ({
       loc: `/projects/${p.slug}`,
       priority: 0.7,
+      changefreq: 'weekly',
       lastmod: p.updated_at || p.created_at || undefined,
     })),
   ];
