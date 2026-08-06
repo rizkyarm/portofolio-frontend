@@ -457,10 +457,10 @@ export default function ProfileAdmin() {
               <Section title="Statistik Portfolio" desc="Angka yang tampil di hero section dan halaman About">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {[
-                    { key: 'projects',   label: '🗂️  Total Projects',   suffix: '+' },
-                    { key: 'clients',    label: '🤝  Happy Clients',    suffix: '' },
-                    { key: 'experience', label: '📅  Years Experience', suffix: '' },
-                    { key: 'coffee',     label: '☕  Cups of Coffee',  suffix: '+' },
+                    { key: 'projects',   label: '🗂️  Total Projects',   suffix: '+', max: 999,  step: 1   },
+                    { key: 'clients',    label: '🤝  Happy Clients',    suffix: '+', max: 999,  step: 1   },
+                    { key: 'experience', label: '📅  Years Experience', suffix: 'yr', max: 20,  step: 1   },
+                    { key: 'coffee',     label: '☕  Cups of Coffee',  suffix: '+', max: 9999, step: 100 },
                   ].map(stat => (
                     <div key={stat.key}
                       className={`rounded-2xl border p-5 transition-all hover:shadow-md 
@@ -468,24 +468,51 @@ export default function ProfileAdmin() {
                       <div className={`text-sm font-semibold mb-3 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                         {stat.label}
                       </div>
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="font-sora font-bold text-4xl text-purple-500">
-                          {form.stats[stat.key]}
-                        </span>
-                        <span className={`font-sora font-bold text-2xl ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                          {stat.suffix}
-                        </span>
+
+                      <div className="flex items-center gap-2 mb-4">
+                        <button
+                          type="button"
+                          onClick={() => setForm(prev => ({
+                            ...prev,
+                            stats: { ...prev.stats, [stat.key]: Math.max(0, prev.stats[stat.key] - stat.step) }
+                          }))}
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 transition-all active:scale-95
+                            ${isDarkMode ? 'bg-slate-600 text-slate-200 hover:bg-slate-500' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}
+                        >−</button>
+                        <input
+                          type="number"
+                          min={0}
+                          max={stat.max}
+                          value={form.stats[stat.key]}
+                          onChange={e => {
+                            const v = Math.min(stat.max, Math.max(0, Number(e.target.value) || 0));
+                            setForm(prev => ({ ...prev, stats: { ...prev.stats, [stat.key]: v } }));
+                          }}
+                          className={`flex-1 text-center font-sora font-bold text-3xl py-1.5 rounded-xl border outline-none transition-all
+                            [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                            ${isDarkMode
+                              ? 'bg-slate-900 border-slate-600 text-purple-400 focus:border-purple-500'
+                              : 'bg-white border-slate-300 text-purple-600 focus:border-purple-500'}`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setForm(prev => ({
+                            ...prev,
+                            stats: { ...prev.stats, [stat.key]: Math.min(stat.max, prev.stats[stat.key] + stat.step) }
+                          }))}
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0 transition-all active:scale-95
+                            ${isDarkMode ? 'bg-purple-700 text-white hover:bg-purple-600' : 'bg-purple-600 text-white hover:bg-purple-500'}`}
+                        >+</button>
                       </div>
+
                       <input
-                        type="range" min={0}
-                        max={stat.key === 'coffee' ? 9999 : stat.key === 'experience' ? 20 : 999}
-                        step={stat.key === 'coffee' ? 100 : 1}
+                        type="range" min={0} max={stat.max} step={stat.step}
                         value={form.stats[stat.key]} onChange={setStat(stat.key)}
                         className="w-full h-2 rounded-full appearance-none cursor-pointer bg-slate-200 accent-purple-500 dark:bg-slate-600"
                       />
                       <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                         <span>0</span>
-                        <span>{stat.key === 'coffee' ? '9,999' : stat.key === 'experience' ? '20' : '999'}</span>
+                        <span>{stat.max.toLocaleString()}</span>
                       </div>
                     </div>
                   ))}
@@ -498,10 +525,10 @@ export default function ProfileAdmin() {
                   </div>
                   <div className="grid grid-cols-4 gap-3">
                     {[
-                      { val: `${form.stats.projects}+`, label: 'Projects' },
-                      { val: form.stats.clients,        label: 'Clients' },
+                      { val: `${form.stats.projects}+`,    label: 'Projects' },
+                      { val: `${form.stats.clients}+`,     label: 'Clients' },
                       { val: `${form.stats.experience}yr`, label: 'Experience' },
-                      { val: `${form.stats.coffee}+`,   label: 'Coffees' },
+                      { val: `${form.stats.coffee}+`,      label: 'Coffees' },
                     ].map(s => (
                       <div key={s.label} className={`text-center p-3 rounded-xl ${isDarkMode ? 'bg-slate-700' : 'bg-slate-50'}`}>
                         <div className={`font-sora font-bold text-xl ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>
