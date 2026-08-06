@@ -40,7 +40,6 @@ export default function Home() {
       if (raw?.stats && typeof raw.stats === 'string') {
         try { raw.stats = JSON.parse(raw.stats); } catch { /* keep string */ }
       }
-      // Transform MinIO URLs
       if (raw?.cv_url) raw.cv_url = getFileUrl(raw.cv_url);
       return raw;
     },
@@ -151,16 +150,30 @@ export default function Home() {
             className="flex items-center justify-center gap-6 md:gap-12"
           >
             {[
-              { number: `${profileStats.projects || 0}+`, label: 'Projects Completed' },
-              { number: `${profileStats.experience || 0}+`, label: 'Years Experience' },
-              { number: `${profileStats.clients || 0}+`, label: 'Happy Clients' },
+              { number: profileStats.projects, label: 'Projects Completed' },
+              { number: profileStats.experience, label: 'Years Experience' },
+              { number: profileStats.clients, label: 'Happy Clients' },
             ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="font-sora font-bold text-3xl md:text-4xl text-[var(--color-text)] mb-1">
-                  {stat.number}
-                </div>
-                <div className="text-xs md:text-sm text-[var(--color-muted)] uppercase tracking-wider">
-                  {stat.label}
+              <div key={i} className="flex items-center gap-6 md:gap-12">
+                {i > 0 && (
+                  <div className="hidden sm:block w-px h-10 bg-[var(--color-border)]" />
+                )}
+                <div className="text-center">
+                  {profLoading ? (
+                    <>
+                      <div className="h-9 w-16 rounded-lg bg-white/10 animate-pulse mb-1 mx-auto" />
+                      <div className="h-3 w-24 rounded bg-white/10 animate-pulse mx-auto" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="font-sora font-bold text-3xl md:text-4xl text-[var(--color-text)] mb-1">
+                        {stat.number != null && stat.number !== '' ? `${Number(stat.number)}+` : '—'}
+                      </div>
+                      <div className="text-xs md:text-sm text-[var(--color-muted)] uppercase tracking-wider">
+                        {stat.label}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

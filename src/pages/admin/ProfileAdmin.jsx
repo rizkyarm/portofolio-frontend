@@ -142,7 +142,7 @@ const INIT = {
   name: '', tagline: '', bio: '', email: '', phone: '',
   location: '', cv_url: '',
   socials: { linkedin:'', github:'', youtube:'', instagram:'', twitter:'', website:'' },
-  stats: { projects: 24, clients: 18, experience: 3, coffee: 1000 },
+  stats: { projects: 0, clients: 0, experience: 0, coffee: 0 },
 };
 
 export default function ProfileAdmin() {
@@ -189,10 +189,10 @@ export default function ProfileAdmin() {
           website:   parsedSocials.website   || '',
         },
         stats: {
-          projects:   parsedStats.projects   ?? 24,
-          clients:    parsedStats.clients    ?? 18,
-          experience: parsedStats.experience ?? 3,
-          coffee:     parsedStats.coffee     ?? 1000,
+          projects:   Number(parsedStats.projects   ?? 0),
+          clients:    Number(parsedStats.clients    ?? 0),
+          experience: Number(parsedStats.experience ?? 0),
+          coffee:     Number(parsedStats.coffee     ?? 0),
         },
       });
       if (d.avatar) setAvatarPreview(d.avatar);

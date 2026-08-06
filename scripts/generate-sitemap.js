@@ -10,7 +10,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // config
 const SITE_URL = process.env.VITE_SITE_URL || 'https://rizkiaditiyar.vercel.app';
-// Sitemap fetch harus pakai URL absolut (bukan VITE_API_URL yang bisa relatif saat prerender)
 const API_URL  = process.env.SITEMAP_API_URL || 'https://rizkiaditiyar-backend.my.id/api/v1';
 const OUTPUT   = path.resolve(__dirname, '..', 'public', 'sitemap.xml');
 
